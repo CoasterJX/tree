@@ -10,8 +10,8 @@ fn test_rb_rotate() {
     }
     RB::print_tree(&root);
     
-    // perform left rotate at 10
-    let root = RB::left_rotate(root, 10);
+    // perform right rotate at 10
+    let root = RB::left_rotate(root, 12);
     RB::print_tree(&root);
 }
 

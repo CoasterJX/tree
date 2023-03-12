@@ -181,6 +181,64 @@ impl<T: Ord + Clone + Debug> RBTreeNode<T> {
         }
     }
 
+    pub fn right_rotate(root: RBTChild<T>, key: T) -> RBTChild<T> {
+
+        let root_copy = root.clone();
+        let x = RBTreeNode::find_node(&root, key.clone());
+        let parent = RBTreeNode::get_parent(&x);
+        match &parent {
+            Some(_) => {
+                if RBTreeNode::is_node_equal(&x, &RBTreeNode::get_right(&parent)) {
+                    RBTreeNode::set_child(
+                        &parent, 
+                        RBTreeNode::_right_rotate(&root, key), 
+                        Direction::Right
+                    );
+                } else {
+                    RBTreeNode::set_child(
+                        &parent, 
+                        RBTreeNode::_right_rotate(&root, key), 
+                        Direction::Left
+                    );
+                }
+                return root_copy;
+            },
+            None => {
+                return RBTreeNode::_right_rotate(&root, key)
+            },
+        }
+    }
+
+    pub fn _right_rotate(root: &RBTChild<T>, key: T) -> RBTChild<T> {
+
+        match root {
+            Some(_) => {
+
+                let x = RBTreeNode::find_node(root, key);
+                let y = RBTreeNode::get_left(&x);
+                match y {
+                    None => return root.clone(),
+                    _ => (),
+                }
+                
+                RBTreeNode::set_child(&x, RBTreeNode::get_right(&y), Direction::Left);
+
+                match RBTreeNode::get_right(&y) {
+                    Some(_) => RBTreeNode::set_parent(&RBTreeNode::get_right(&y), &x),
+                    None => (),
+                };
+                RBTreeNode::set_parent(&y, &RBTreeNode::get_parent(&x));
+
+                RBTreeNode::set_parent(&x, &y);
+                RBTreeNode::set_child(&y, x, Direction::Right);
+
+                return y; // this y must be used to set the parent's left or right
+
+            },
+            None => todo!("Does not support empty root now"),
+        }
+    }
+
 
     pub fn is_node_equal(root1: &RBTChild<T>, root2: &RBTChild<T>) -> bool {
         match (root1, root2) {
