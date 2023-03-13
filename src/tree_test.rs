@@ -1,6 +1,6 @@
 use super::*;
 use red_black_tree::{RBTreeNode as RB, NodeColor};
-
+use tree_type::RedBlackTree as RBT;
 
 #[test]
 fn test_rb_rotate() {
@@ -13,6 +13,16 @@ fn test_rb_rotate() {
     // perform right rotate at 10
     let root = RB::left_rotate(root, 12);
     RB::print_tree(&root);
+}
+
+
+#[test]
+fn test_rb_insert() {
+    let mut rbt = RBT::<u64>::new();
+    for i in [5, 2, 10, 8, 6, 9, 12, 13] {
+        rbt.insert(&i);
+    }
+    rbt.print();
 }
 
 

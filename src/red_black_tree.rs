@@ -9,6 +9,16 @@ pub enum NodeColor {
     Black,
 }
 
+impl NodeColor {
+
+    pub fn recolor(&mut self) {
+        match &self {
+            NodeColor::Red => *self = NodeColor::Black,
+            NodeColor::Black => *self = NodeColor::Red,
+        }
+    }
+}
+
 pub enum Direction {
     Left,
     Right,
@@ -16,7 +26,7 @@ pub enum Direction {
 
 type TChild<T> = Rc<RefCell<RBTreeNode<T>>>;
 type TParent<T> = Weak<RefCell<RBTreeNode<T>>>;
-type RBTChild<T> = Option<TChild<T>>;
+pub type RBTChild<T> = Option<TChild<T>>;
 type RBTParent<T> = Option<TParent<T>>;
 
 #[derive(Debug)]
@@ -250,6 +260,36 @@ impl<T: Ord + Clone + Debug> RBTreeNode<T> {
                 }
             },
             _ => false
+        }
+    }
+
+
+    pub fn get_color(root: &RBTChild<T>, key: T) -> NodeColor {
+        let target = RBTreeNode::find_node(root, key);
+        RBTreeNode::get_root_color(&target)
+    }
+
+
+    pub fn get_root_color(root: &RBTChild<T>) -> NodeColor {
+        match root {
+            Some(target_ptr) => target_ptr.borrow().color.clone(),
+            None => NodeColor::Black,
+        }
+    }
+
+
+    pub fn set_root_color(root: &RBTChild<T>, color: NodeColor) {
+        match root {
+            Some(root_ptr) => root_ptr.borrow_mut().color = color,
+            None => todo!("should never happen"),
+        }
+    }
+
+
+    pub fn get_root_key(root: &RBTChild<T>) -> T {
+        match root {
+            Some(root_ptr) => root_ptr.borrow().key.clone(),
+            None => todo!("should never happen"),
         }
     }
 
