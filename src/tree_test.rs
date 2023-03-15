@@ -25,6 +25,88 @@ fn test_rb_insert() {
     rbt.print();
 }
 
+#[test]
+fn test_rb_delete1() {
+    let mut rbt = RBT::<u64>::new();
+    for i in [12, 8, 15, 5, 9, 13, 19, 10, 23] {
+        rbt.insert(&i);
+    }
+    rbt.delete(&19);
+    rbt.print();
+}
+
+#[test]
+fn test_rb_delete2() {
+    let mut rbt = RBT::<u64>::new();
+    for i in [12, 8, 15, 5, 9, 13, 23, 1, 10] {
+        rbt.insert(&i);
+    }
+    rbt.delete(&5);
+    rbt.print();
+}
+
+#[test]
+fn test_rb_delete3() {
+    let mut rbt = RBT::<u64>::new();
+    for i in [12, 8, 15, 1, 9, 13, 23, 10] {
+        rbt.insert(&i);
+    }
+    rbt.delete(&12);
+    rbt.print();
+}
+
+#[test]
+fn test_rb_transplant1() {
+    let mut rbt = RBT::<u64>::new();
+    for i in [15, 12, 19, 9, 13, 23] {
+        rbt.insert(&i);
+    }
+    rbt.transplant(
+        &RB::find_node(&rbt.root, 15),
+        &RB::find_node(&rbt.root, 19)
+    );
+    rbt.print();
+    //RB::print_tree(&rbt.get_minimum());
+}
+
+#[test]
+fn test_rb_transplant2() {
+    let mut rbt = RBT::<u64>::new();
+    for i in [15, 12, 19, 13, 23] {
+        rbt.insert(&i);
+    }
+    rbt.transplant(
+        &RB::find_node(&rbt.root, 12),
+        &RB::find_node(&rbt.root, 13)
+    );
+    rbt.print();
+}
+
+#[test]
+fn test_rb_transplant3() {
+    let mut rbt = RBT::<u64>::new();
+    for i in [15, 12, 19, 8, 23] {
+        rbt.insert(&i);
+    }
+    rbt.transplant(
+        &RB::find_node(&rbt.root, 19),
+        &RB::find_node(&rbt.root, 23)
+    );
+    rbt.print();
+}
+
+#[test]
+fn test_rb_transplant4() {
+    let mut rbt = RBT::<u64>::new();
+    for i in [15, 12, 19, 8, 23] {
+        rbt.insert(&i);
+    }
+    rbt.transplant(
+        &RB::find_node(&rbt.root, 23),
+        &None
+    );
+    rbt.print();
+}
 
 // #[test]
 // fn test_rb_insert_find() {

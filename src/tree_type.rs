@@ -23,6 +23,72 @@ impl<T: Ord + Clone + Debug> RedBlackTree<T> {
         RB::print_tree(&self.root)
     }
 
+    pub fn transplant(&mut self, u: &TRoot<T>, v: &TRoot<T>) {
+        let u_node = u.clone();
+        let v_node = v.clone();
+        match RB::get_parent(&u_node) {
+            Some(_) => {
+                if RB::is_node_equal(&u_node, &RB::get_left(&RB::get_parent(&u_node))) {
+                    RB::set_child(&RB::get_parent(&u_node), v_node.clone(), Dir::Left);
+                } else {
+                    RB::set_child(&RB::get_parent(&u_node), v_node.clone(), Dir::Right);
+                }
+            },
+            None => self.root = v_node.clone(),
+        };
+        RB::set_parent(&v_node, &RB::get_parent(&u_node));
+    }
+
+    pub fn get_minimum(&self) -> TRoot<T> {
+        RB::get_minimum(&self.root)
+    }
+
+    fn delete_fixup(&mut self, x: &TRoot<T>) {
+        
+    }
+
+    pub fn delete(&mut self, key: &T) {
+        let z = RB::find_node(&self.root, key.clone());
+        match z {
+            None => return,
+            _ => (),
+        };
+
+        let mut x: TRoot<T> = None;
+        let mut y = z.clone();
+        let mut y_orig_color = RB::get_root_color(&y);
+
+        if let None = RB::get_left(&z) {
+            x = RB::get_right(&z);
+            self.transplant(&z, &RB::get_right(&z));
+        } else if let None = RB::get_right(&z) {
+            x = RB::get_left(&z);
+            self.transplant(&z, &RB::get_left(&z));
+        } else {
+            y = RB::get_minimum(&RB::get_right(&z));
+            y_orig_color = RB::get_root_color(&y);
+            x = RB::get_right(&y);
+
+            if RB::is_node_equal(&RB::get_parent(&y), &z) {
+                RB::set_parent(&x, &y);
+            } else {
+                self.transplant(&y, &RB::get_right(&y));
+                RB::set_child(&y, RB::get_right(&z), Dir::Right);
+                RB::set_parent(&RB::get_right(&y), &y);
+            }
+
+            self.transplant(&z, &y);
+            RB::set_child(&y, RB::get_left(&z), Dir::Left);
+            RB::set_parent(&RB::get_left(&y), &y);
+            RB::set_root_color(&y, RB::get_root_color(&z));
+        }
+
+        match y_orig_color {
+            NC::Red => (),
+            NC::Black => self.delete_fixup(&x),
+        };
+    }
+
     pub fn insert(&mut self, key: &T) {
         match &self.root {
             Some(_) => RB::insert_node(&self.root, key.clone()),

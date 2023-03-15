@@ -321,7 +321,7 @@ impl<T: Ord + Clone + Debug> RBTreeNode<T> {
                     None => node_ref.parent = None,
                 }
             },
-            None => todo!("not supported"),
+            None => (),
         }
     }
 
@@ -349,6 +349,20 @@ impl<T: Ord + Clone + Debug> RBTreeNode<T> {
                 } else {return None;}
             },
             None => None,
+        }
+    }
+
+
+    pub fn get_minimum(root: &RBTChild<T>) -> RBTChild<T> {
+        match root {
+            Some(tree_ptr) => {
+                let node_ref = tree_ptr.borrow();
+                match &node_ref.left_child {
+                    Some(_) => return RBTreeNode::get_minimum(&node_ref.left_child),
+                    None => return root.clone(),
+                }
+            },
+            None => todo!("not supported"),
         }
     }
 
