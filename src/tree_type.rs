@@ -43,8 +43,72 @@ impl<T: Ord + Clone + Debug> RedBlackTree<T> {
         RB::get_minimum(&self.root)
     }
 
-    fn delete_fixup(&mut self, x: &TRoot<T>) {
-        
+    fn delete_fixup(&mut self, fix_root: &TRoot<T>) {
+        RB::print_tree(&self.root);
+        RB::print_tree(fix_root);
+        let mut x = fix_root.clone();
+        while !RB::is_node_equal(&x, &self.root) && RB::get_root_color(&x) == NC::Black {
+            if RB::is_node_equal(&x, &RB::get_left(&RB::get_parent(&x))) {
+                let mut w = RB::get_right(&RB::get_parent(&x));
+                // type 1
+                if RB::get_root_color(&w) == NC::Red {
+                    RB::set_root_color(&w, NC::Black);
+                    RB::set_root_color(&RB::get_parent(&x), NC::Red);
+                    self.root = RB::left_rotate(self.root.clone(), RB::get_root_key(&RB::get_parent(&x)));
+                    w = RB::get_right(&RB::get_parent(&x));
+                }
+                // type 2
+                if RB::get_root_color(&RB::get_left(&w)) == NC::Black
+                && RB::get_root_color(&RB::get_right(&w)) == NC::Black {
+                    RB::set_root_color(&w, NC::Red);
+                    x = RB::get_parent(&x);
+                } else {
+                    // type 3
+                    if RB::get_root_color(&RB::get_right(&w)) == NC::Black {
+                        RB::set_root_color(&RB::get_left(&w), NC::Black);
+                        RB::set_root_color(&w, NC::Red);
+                        self.root = RB::right_rotate(self.root.clone(), RB::get_root_key(&w));
+                        w = RB::get_right(&RB::get_parent(&x));
+                    }
+                    // type 4
+                    RB::set_root_color(&w, RB::get_root_color(&RB::get_parent(&x)));
+                    RB::set_root_color(&RB::get_parent(&x), NC::Black);
+                    RB::set_root_color(&RB::get_right(&w), NC::Black);
+                    self.root = RB::left_rotate(self.root.clone(), RB::get_root_key(&RB::get_parent(&x)));
+                    x = self.root.clone();
+                }
+            } else {
+                let mut w = RB::get_left(&RB::get_parent(&x));
+                // type 1
+                if RB::get_root_color(&w) == NC::Red {
+                    RB::set_root_color(&w, NC::Black);
+                    RB::set_root_color(&RB::get_parent(&x), NC::Red);
+                    self.root = RB::right_rotate(self.root.clone(), RB::get_root_key(&RB::get_parent(&x)));
+                    w = RB::get_left(&RB::get_parent(&x));
+                }
+                // type 2
+                if RB::get_root_color(&RB::get_right(&w)) == NC::Black
+                && RB::get_root_color(&RB::get_left(&w)) == NC::Black {
+                    RB::set_root_color(&w, NC::Red);
+                    x = RB::get_parent(&x);
+                } else {
+                    // type 3
+                    if RB::get_root_color(&RB::get_left(&w)) == NC::Black {
+                        RB::set_root_color(&RB::get_right(&w), NC::Black);
+                        RB::set_root_color(&w, NC::Red);
+                        self.root = RB::left_rotate(self.root.clone(), RB::get_root_key(&w));
+                        w = RB::get_left(&RB::get_parent(&x));
+                    }
+                    // type 4
+                    RB::set_root_color(&w, RB::get_root_color(&RB::get_parent(&x)));
+                    RB::set_root_color(&RB::get_parent(&x), NC::Black);
+                    RB::set_root_color(&RB::get_left(&w), NC::Black);
+                    self.root = RB::right_rotate(self.root.clone(), RB::get_root_key(&RB::get_parent(&x)));
+                    x = self.root.clone();
+                }
+            }
+        }
+        RB::set_root_color(&x, NC::Black);
     }
 
     pub fn delete(&mut self, key: &T) {

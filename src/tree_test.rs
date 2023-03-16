@@ -31,7 +31,7 @@ fn test_rb_delete1() {
     for i in [12, 8, 15, 5, 9, 13, 19, 10, 23] {
         rbt.insert(&i);
     }
-    rbt.delete(&19);
+    rbt.delete(&12);
     rbt.print();
 }
 
