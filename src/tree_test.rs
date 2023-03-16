@@ -1,12 +1,8 @@
 use super::*;
 use red_black_tree::{RBTreeNode as RB, NodeColor};
 use tree_type::RedBlackTree as RBT;
-<<<<<<< HEAD
 use avl_tree::{AVLTreeNode as AVL};
-use 
-=======
 use rand::Rng;
->>>>>>> master
 
 #[test]
 fn test_rb_rotate() {
