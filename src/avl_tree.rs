@@ -62,6 +62,14 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
         )
     }
 
+    pub fn get_balance_factor(root: &AVLChild<T>) -> i64 {
+        if AVLTreeNode::get_root_nil(root) {return 0;}
+        let lh: i64 = AVLTreeNode::get_height(&AVLTreeNode::get_left(root)) as i64;
+        let rh: i64 = AVLTreeNode::get_height(&AVLTreeNode::get_right(root)) as i64;
+        let balance_factor: i64 = rh - lh;
+        balance_factor
+    }
+
 
     fn to_string_nil(direction: &Direction, extra: &str) {
         let direction_str = match direction {
