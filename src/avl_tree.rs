@@ -8,13 +8,13 @@ pub enum Direction {
     Right,
 }
 
-type TChild<T> = Rc<RefCell<AVLreeNode<T>>>;
-type TParent<T> = Weak<RefCell<AVLreeNode<T>>>;
+type TChild<T> = Rc<RefCell<AVLTreeNode<T>>>;
+type TParent<T> = Weak<RefCell<AVLTreeNode<T>>>;
 pub type AVLChild<T> = Option<TChild<T>>;
 type AVLParent<T> = Option<TParent<T>>;
 
 #[derive(Debug)]
-pub struct AVLTreeNode<T: Ord + Clone> {\
+pub struct AVLTreeNode<T: Ord + Clone> {
     pub key: T,
     pub parent: AVLParent<T>,
     left_child: AVLChild<T>,
@@ -30,11 +30,11 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
 
 
     pub fn new(key: T) -> AVLChild<T> {
-        AVLTreeNode::_new(ke, None)
+        AVLTreeNode::_new(key, None)
     }
 
 
-    fn _new(key: T,, parent: AVLChild<T>) -> AVLChild<T> {
+    fn _new(key: T, parent: AVLParent<T>) -> AVLChild<T> {
         let node = Rc::new(RefCell::new(Self { 
             key, 
             parent, 
@@ -84,7 +84,7 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
                 let node_ref = tree_ptr.borrow();
                 AVLTreeNode::to_string(
                     &direction, 
-                    &RBTreeNode::get_parent(&root),
+                    &AVLTreeNode::get_parent(&root),
                     &node_ref.key, 
                     extra);
                 
@@ -314,7 +314,7 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
     }
 
 
-    pub fn insert_node(root: &RBTChild<T>, key: T) {
+    pub fn insert_node(root: &AVLChild<T>, key: T) {
         let _ = AVLTreeNode::_recurse_node(root, key, true);
     }
 

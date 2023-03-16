@@ -17,6 +17,19 @@ fn test_rb_rotate() {
     RB::print_tree(&root);
 }
 
+#[test]
+fn test_avl_rotate() {
+    let root = AVL::new(5);
+    for i in [5, 2, 10, 8, 6, 9, 12] {
+        AVL::insert_node(&root, i);
+    }
+    AVL::print_tree(&root);
+
+    // perform right rotate at 10
+    let root = AVL::left_rotate(root, 10);
+    AVL::print_tree(&root);
+}
+
 
 #[test]
 fn test_rb_insert() {
