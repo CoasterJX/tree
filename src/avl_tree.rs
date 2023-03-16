@@ -271,6 +271,18 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
         }
     }
 
+    pub fn is_leaf(root: &AVLChild<T>) -> bool {
+        match root {
+            Some(tree_ptr) => {
+                let node_ref = tree_ptr.borrow();
+                match (&node_ref.left_child, &node_ref.right_child) {
+                    (None, None) => return true,
+                    _ => return false,
+                };
+            },
+            None => false,
+        }
+    }
 
     pub fn get_parent_by_key(root: &AVLChild<T>, key: T) -> AVLChild<T> {
         AVLTreeNode::get_parent(&AVLTreeNode::find_node(root, key))
@@ -304,6 +316,50 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
         }
     }
 
+    pub fn set_child_nil(root: &AVLChild<T>, direction: Direction) {
+        match root {
+            Some(_) => {
+                let nil_node = AVLTreeNode::_new(AVLTreeNode::get_root_key(root).clone(), None, true);
+                match direction {
+                    Direction::Left => {
+                        AVLTreeNode::set_child(root, nil_node, direction);
+                        AVLTreeNode::set_parent(&AVLTreeNode::get_left(root), root);
+                    },
+                    Direction::Right => {
+                        AVLTreeNode::set_child(root, nil_node, direction);
+                        AVLTreeNode::set_parent(&AVLTreeNode::get_right(root), root);
+                    },
+                }
+            },
+            None => todo!("not supported"),
+        }
+    }
+
+    pub fn solidify_all_nil(root: &AVLChild<T>) {
+        if let None = AVLTreeNode::get_left(root) {
+            AVLTreeNode::set_child_nil(root, Direction::Left);
+        } else {
+            AVLTreeNode::solidify_all_nil(&AVLTreeNode::get_left(root));
+        };
+        if let None = AVLTreeNode::get_right(root) {
+            AVLTreeNode::set_child_nil(root, Direction::Right);
+        } else {
+            AVLTreeNode::solidify_all_nil(&AVLTreeNode::get_right(root));
+        };
+    }
+
+    pub fn virtualize_all_nil(root: &AVLChild<T>) {
+        if AVLTreeNode::get_root_nil(&AVLTreeNode::get_left(root)) {
+            AVLTreeNode::set_child(root, None, Direction::Left);
+        } else {
+            AVLTreeNode::virtualize_all_nil(&AVLTreeNode::get_left(root));
+        };
+        if AVLTreeNode::get_root_nil(&AVLTreeNode::get_right(root)) {
+            AVLTreeNode::set_child(root, None, Direction::Right);
+        } else {
+            AVLTreeNode::virtualize_all_nil(&AVLTreeNode::get_right(root));
+        };
+    }
 
     pub fn get_left(root: &AVLChild<T>) -> AVLChild<T> {
         match root {
@@ -317,6 +373,23 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
         }
     }
 
+    pub fn get_minimum(root: &AVLChild<T>) -> AVLChild<T> {
+        match root {
+            Some(tree_ptr) => {
+                let node_ref = tree_ptr.borrow();
+                match &node_ref.left_child {
+                    Some(_) => {
+                        if AVLTreeNode::get_root_nil(&node_ref.left_child) {
+                            return root.clone();
+                        }
+                        return AVLTreeNode::get_minimum(&node_ref.left_child)
+                    },
+                    None => return root.clone(),
+                }
+            },
+            None => todo!("not supported"),
+        }
+    }
 
     pub fn get_right(root: &AVLChild<T>) -> AVLChild<T> {
         match root {
