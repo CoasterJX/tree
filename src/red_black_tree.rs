@@ -533,7 +533,7 @@ impl<T: Ord + Clone + Debug> RBTreeNode<T> {
                     },
                 }
             },
-            None => {todo!("Can we change 'root' here?")},
+            None => {return None;},
         }
     }
 
