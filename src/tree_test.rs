@@ -1,6 +1,7 @@
 use super::*;
 use red_black_tree::{RBTreeNode as RB, NodeColor};
 use tree_type::RedBlackTree as RBT;
+use rand::Rng;
 
 #[test]
 fn test_rb_rotate() {
@@ -22,9 +23,113 @@ fn test_rb_insert() {
     for i in [5, 2, 10, 8, 6, 9, 12, 13] {
         rbt.insert(&i);
     }
-    rbt.print();
+    rbt.print_tree();
 }
 
+#[test]
+fn test_rb_delete1() {
+    let mut rbt = RBT::<u64>::new();
+    println!("{:?}", rbt.is_empty());
+    for i in [12, 8, 15, 5, 9, 13, 19, 10, 23] {
+        rbt.insert(&i);
+    }
+    //RB::solidify_all_nil(&rbt.root);
+    //RB::virtualize_all_nil(&rbt.root2;
+    //rbt.delete(&12);
+    //rbt.delete(&10);
+    // rbt.print_tree();
+    // println!("{:?}", rbt.is_empty());
+    rbt.print_traverse(std::cmp::Ordering::Equal);
+}
+
+#[test]
+fn test_pressure() {
+    let mut rbt = RBT::<u64>::new();
+    let mut rng = rand::thread_rng();
+    let mut inserted = vec![];
+    for _ in 0..10000 {
+        let a = rng.gen_range(0..100000);
+        rbt.insert(&a);
+        inserted.append(&mut vec![a]);
+    }
+    for i in inserted {
+        rbt.delete(&i);
+    }
+    rbt.print_tree();
+}
+
+#[test]
+fn test_rb_delete2() {
+    let mut rbt = RBT::<u64>::new();
+    for i in [12, 8, 15, 5, 9, 13, 23, 1, 10] {
+        rbt.insert(&i);
+    }
+    rbt.delete(&5);
+    rbt.print_tree();
+}
+
+#[test]
+fn test_rb_delete3() {
+    let mut rbt = RBT::<u64>::new();
+    for i in [12, 8, 15, 1, 9, 13, 23, 10] {
+        rbt.insert(&i);
+    }
+    rbt.delete(&12);
+    rbt.print_tree();
+}
+
+#[test]
+fn test_rb_transplant1() {
+    let mut rbt = RBT::<u64>::new();
+    for i in [15, 12, 19, 9, 13, 23] {
+        rbt.insert(&i);
+    }
+    rbt.transplant(
+        &RB::find_node(&rbt.root, 15),
+        &RB::find_node(&rbt.root, 19)
+    );
+    rbt.print_tree();
+    //RB::print_tree(&rbt.get_minimum());
+}
+
+#[test]
+fn test_rb_transplant2() {
+    let mut rbt = RBT::<u64>::new();
+    for i in [15, 12, 19, 13, 23] {
+        rbt.insert(&i);
+    }
+    rbt.transplant(
+        &RB::find_node(&rbt.root, 12),
+        &RB::find_node(&rbt.root, 13)
+    );
+    rbt.print_tree();
+}
+
+#[test]
+fn test_rb_transplant3() {
+    let mut rbt = RBT::<u64>::new();
+    for i in [15, 12, 19, 8, 23] {
+        rbt.insert(&i);
+    }
+    rbt.transplant(
+        &RB::find_node(&rbt.root, 19),
+        &RB::find_node(&rbt.root, 23)
+    );
+    rbt.print_tree();
+}
+
+#[test]
+fn test_rb_transplant4() {
+    let mut rbt = RBT::<u64>::new();
+    for i in [15, 12, 19, 8, 23] {
+        rbt.insert(&i);
+    }
+    rbt.transplant(
+        &RB::find_node(&rbt.root, 23),
+        &None
+    );
+    rbt.print_tree();
+}
 
 // #[test]
 // fn test_rb_insert_find() {
