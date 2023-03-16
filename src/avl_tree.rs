@@ -1,7 +1,7 @@
 ﻿use std::cell::RefCell;
 use std::fmt::Debug;
 use std::rc::{Rc, Weak};
-use std::cmp::Ordering;
+use std::cmp::{Ordering, max};
 
 pub enum Direction {
     Left,
@@ -19,7 +19,8 @@ pub struct AVLTreeNode<T: Ord + Clone> {
     pub parent: AVLParent<T>,
     left_child: AVLChild<T>,
     right_child: AVLChild<T>,
-    pub _ptr_self: AVLParent<T>
+    pub _ptr_self: AVLParent<T>,
+    pub is_nil: bool
 }
 
 impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
@@ -30,17 +31,18 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
 
 
     pub fn new(key: T) -> AVLChild<T> {
-        AVLTreeNode::_new(key, None)
+        AVLTreeNode::_new(key, None, false)
     }
 
 
-    fn _new(key: T, parent: AVLParent<T>) -> AVLChild<T> {
+    fn _new(key: T, parent: AVLParent<T>, is_nil: bool) -> AVLChild<T> {
         let node = Rc::new(RefCell::new(Self { 
             key, 
             parent, 
             left_child: None, 
             right_child: None,
-            _ptr_self: None
+            _ptr_self: None,
+            is_nil,
         }));
 
         let weak_ptr = Rc::downgrade(&node);
@@ -50,6 +52,14 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
         }
 
         Some(node)
+    }
+
+    pub fn get_height(root: &AVLChild<T>) -> u128 {
+        if AVLTreeNode::get_root_nil(root) {return 0;}
+        1 + max(
+            AVLTreeNode::get_height(&AVLTreeNode::get_left(root)),
+            AVLTreeNode::get_height(&AVLTreeNode::get_right(root))
+        )
     }
 
 
@@ -241,6 +251,13 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
         }
     }
 
+    pub fn get_root_nil(root: &AVLChild<T>) -> bool {
+        match root {
+            Some(target_ptr) => target_ptr.borrow().is_nil.clone(),
+            None => true,
+        }
+    }
+
 
     pub fn get_parent(root: &AVLChild<T>) -> AVLChild<T> {
         match root {
@@ -337,7 +354,7 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
                             Some(_) => AVLTreeNode::_recurse_node(&node_ref.left_child, key, insert),
                             None => {
                                 if insert {
-                                    node_ref.left_child = AVLTreeNode::_new(key, node_ref._ptr_self.clone());
+                                    node_ref.left_child = AVLTreeNode::_new(key, node_ref._ptr_self.clone(), false);
                                     if let Some(insert_ptr) = &node_ref.left_child {
                                         return Some(insert_ptr.clone());
                                     } else {todo!("should never reach here")}
@@ -352,7 +369,7 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
                             Some(_) => AVLTreeNode::_recurse_node(&node_ref.right_child, key, insert),
                             None => {
                                 if insert {
-                                    node_ref.right_child = AVLTreeNode::_new(key, node_ref._ptr_self.clone());
+                                    node_ref.right_child = AVLTreeNode::_new(key, node_ref._ptr_self.clone(), false);
                                     if let Some(insert_ptr) = &node_ref.right_child {
                                         return Some(insert_ptr.clone());
                                     } else {todo!("should never reach here")}
