@@ -1,7 +1,7 @@
 use std::cell::RefCell;
 use std::fmt::Debug;
 use std::rc::{Rc, Weak};
-use std::cmp::Ordering;
+use std::cmp::{Ordering, max};
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum NodeColor {
@@ -19,6 +19,7 @@ impl NodeColor {
     }
 }
 
+#[derive(PartialEq)]
 pub enum Direction {
     Left,
     Right,
@@ -36,7 +37,8 @@ pub struct RBTreeNode<T: Ord + Clone> {
     pub parent: RBTParent<T>,
     left_child: RBTChild<T>,
     right_child: RBTChild<T>,
-    pub _ptr_self: RBTParent<T>
+    pub _ptr_self: RBTParent<T>,
+    pub is_nil: bool
 }
 
 impl<T: Ord + Clone + Debug> RBTreeNode<T> {
@@ -47,18 +49,35 @@ impl<T: Ord + Clone + Debug> RBTreeNode<T> {
 
 
     pub fn new(key: T) -> RBTChild<T> {
-        RBTreeNode::_new(key, NodeColor::Black, None)
+        RBTreeNode::_new(key, NodeColor::Black, None, false)
     }
 
 
-    fn _new(key: T, color: NodeColor, parent: RBTParent<T>) -> RBTChild<T> {
+    pub fn count_leaves(root: &RBTChild<T>) -> u128 {
+        if RBTreeNode::get_root_nil(root) {return 0;}
+        if RBTreeNode::is_leaf(root) {return 1;}
+        RBTreeNode::count_leaves(&RBTreeNode::get_left(root)) + RBTreeNode::count_leaves(&RBTreeNode::get_right(root))
+    }
+
+
+    pub fn get_height(root: &RBTChild<T>) -> u128 {
+        if RBTreeNode::get_root_nil(root) {return 0;}
+        1 + max(
+            RBTreeNode::get_height(&RBTreeNode::get_left(root)),
+            RBTreeNode::get_height(&RBTreeNode::get_right(root))
+        )
+    }
+
+
+    fn _new(key: T, color: NodeColor, parent: RBTParent<T>, is_nil: bool) -> RBTChild<T> {
         let node = Rc::new(RefCell::new(Self { 
             color, 
             key, 
             parent, 
             left_child: None, 
             right_child: None,
-            _ptr_self: None
+            _ptr_self: None,
+            is_nil
         }));
         
         let weak_ptr = Rc::downgrade(&node);
@@ -71,12 +90,12 @@ impl<T: Ord + Clone + Debug> RBTreeNode<T> {
     }
 
 
-    fn to_string_nil(direction: &Direction, extra: &str) {
+    fn to_string_nil(direction: &Direction, extra: &str, v: &str) {
         let direction_str = match direction {
             Direction::Left => "<──",
             Direction::Right => "──>",
         };
-        println!("{}{}NIL", extra, direction_str);
+        println!("{}{}NIL{}", extra, direction_str, v);
     }
 
 
@@ -115,15 +134,27 @@ impl<T: Ord + Clone + Debug> RBTreeNode<T> {
                 
                 let (left_child, right_child) = (&node_ref.left_child, &node_ref.right_child);
                 match left_child {
-                    Some(_) => RBTreeNode::_print_tree(left_child, Direction::Left, &(extra.to_owned()+"|\t")),
-                    None => RBTreeNode::<T>::to_string_nil(&Direction::Left, &(extra.to_owned()+"|\t")),
+                    Some(_) => {
+                        if RBTreeNode::get_root_nil(left_child) {
+                            RBTreeNode::<T>::to_string_nil(&Direction::Left, &(extra.to_owned()+"|\t"), &format!("(solidified, parent {:?})", &node_ref.key));
+                        } else {
+                            RBTreeNode::_print_tree(left_child, Direction::Left, &(extra.to_owned()+"|\t"));
+                        }
+                    },
+                    None => RBTreeNode::<T>::to_string_nil(&Direction::Left, &(extra.to_owned()+"|\t"), ""),
                 };
                 match right_child {
-                    Some(_) => RBTreeNode::_print_tree(right_child, Direction::Right, &(extra.to_owned()+"|\t")),
-                    None => RBTreeNode::<T>::to_string_nil(&Direction::Right, &(extra.to_owned()+"|\t")),
+                    Some(_) => {
+                        if RBTreeNode::get_root_nil(right_child) {
+                            RBTreeNode::<T>::to_string_nil(&Direction::Left, &(extra.to_owned()+"|\t"), &format!("(solidified, parent {:?})", &node_ref.key));
+                        } else {
+                            RBTreeNode::_print_tree(right_child, Direction::Right, &(extra.to_owned()+"|\t"));
+                        }
+                    },
+                    None => RBTreeNode::<T>::to_string_nil(&Direction::Right, &(extra.to_owned()+"|\t"), ""),
                 };
             },
-            None => RBTreeNode::<T>::to_string_nil(&Direction::Left, ""),
+            None => RBTreeNode::<T>::to_string_nil(&Direction::Left, "", ""),
         }
     }
 
@@ -251,13 +282,11 @@ impl<T: Ord + Clone + Debug> RBTreeNode<T> {
 
 
     pub fn is_node_equal(root1: &RBTChild<T>, root2: &RBTChild<T>) -> bool {
+
         match (root1, root2) {
-            (None, None) => true,
+            (None, None) => todo!("not supported"),
             (Some(ptr1), Some(ptr2)) => {
-                match ptr1.borrow().key.cmp(&ptr2.borrow().key) {
-                    Ordering::Equal => true,
-                    _ => false,
-                }
+                return Rc::ptr_eq(ptr1, ptr2);
             },
             _ => false
         }
@@ -274,6 +303,14 @@ impl<T: Ord + Clone + Debug> RBTreeNode<T> {
         match root {
             Some(target_ptr) => target_ptr.borrow().color.clone(),
             None => NodeColor::Black,
+        }
+    }
+
+
+    pub fn get_root_nil(root: &RBTChild<T>) -> bool {
+        match root {
+            Some(target_ptr) => target_ptr.borrow().is_nil.clone(),
+            None => true,
         }
     }
 
@@ -307,6 +344,20 @@ impl<T: Ord + Clone + Debug> RBTreeNode<T> {
     }
 
 
+    pub fn is_leaf(root: &RBTChild<T>) -> bool {
+        match root {
+            Some(tree_ptr) => {
+                let node_ref = tree_ptr.borrow();
+                match (&node_ref.left_child, &node_ref.right_child) {
+                    (None, None) => return true,
+                    _ => return false,
+                };
+            },
+            None => false,
+        }
+    }
+
+
     pub fn get_parent_by_key(root: &RBTChild<T>, key: T) -> RBTChild<T> {
         RBTreeNode::get_parent(&RBTreeNode::find_node(root, key))
     }
@@ -321,7 +372,7 @@ impl<T: Ord + Clone + Debug> RBTreeNode<T> {
                     None => node_ref.parent = None,
                 }
             },
-            None => todo!("not supported"),
+            None => (),
         }
     }
 
@@ -340,6 +391,54 @@ impl<T: Ord + Clone + Debug> RBTreeNode<T> {
     }
 
 
+    pub fn set_child_nil(root: &RBTChild<T>, direction: Direction) {
+        match root {
+            Some(_) => {
+                let nil_node = RBTreeNode::_new(RBTreeNode::get_root_key(root).clone(), NodeColor::Black, None, true);
+                match direction {
+                    Direction::Left => {
+                        RBTreeNode::set_child(root, nil_node, direction);
+                        RBTreeNode::set_parent(&RBTreeNode::get_left(root), root);
+                    },
+                    Direction::Right => {
+                        RBTreeNode::set_child(root, nil_node, direction);
+                        RBTreeNode::set_parent(&RBTreeNode::get_right(root), root);
+                    },
+                }
+            },
+            None => todo!("not supported"),
+        }
+    }
+
+
+    pub fn solidify_all_nil(root: &RBTChild<T>) {
+        if let None = RBTreeNode::get_left(root) {
+            RBTreeNode::set_child_nil(root, Direction::Left);
+        } else {
+            RBTreeNode::solidify_all_nil(&RBTreeNode::get_left(root));
+        };
+        if let None = RBTreeNode::get_right(root) {
+            RBTreeNode::set_child_nil(root, Direction::Right);
+        } else {
+            RBTreeNode::solidify_all_nil(&RBTreeNode::get_right(root));
+        };
+    }
+
+
+    pub fn virtualize_all_nil(root: &RBTChild<T>) {
+        if RBTreeNode::get_root_nil(&RBTreeNode::get_left(root)) {
+            RBTreeNode::set_child(root, None, Direction::Left);
+        } else {
+            RBTreeNode::virtualize_all_nil(&RBTreeNode::get_left(root));
+        };
+        if RBTreeNode::get_root_nil(&RBTreeNode::get_right(root)) {
+            RBTreeNode::set_child(root, None, Direction::Right);
+        } else {
+            RBTreeNode::virtualize_all_nil(&RBTreeNode::get_right(root));
+        };
+    }
+
+
     pub fn get_left(root: &RBTChild<T>) -> RBTChild<T> {
         match root {
             Some(tree_ptr) => {
@@ -349,6 +448,25 @@ impl<T: Ord + Clone + Debug> RBTreeNode<T> {
                 } else {return None;}
             },
             None => None,
+        }
+    }
+
+
+    pub fn get_minimum(root: &RBTChild<T>) -> RBTChild<T> {
+        match root {
+            Some(tree_ptr) => {
+                let node_ref = tree_ptr.borrow();
+                match &node_ref.left_child {
+                    Some(_) => {
+                        if RBTreeNode::get_root_nil(&node_ref.left_child) {
+                            return root.clone();
+                        }
+                        return RBTreeNode::get_minimum(&node_ref.left_child)
+                    },
+                    None => return root.clone(),
+                }
+            },
+            None => todo!("not supported"),
         }
     }
 
@@ -390,7 +508,7 @@ impl<T: Ord + Clone + Debug> RBTreeNode<T> {
                             Some(_) => RBTreeNode::_recurse_node(&node_ref.left_child, key, insert),
                             None => {
                                 if insert {
-                                    node_ref.left_child = RBTreeNode::_new(key, NodeColor::Red, node_ref._ptr_self.clone());
+                                    node_ref.left_child = RBTreeNode::_new(key, NodeColor::Red, node_ref._ptr_self.clone(), false);
                                     if let Some(insert_ptr) = &node_ref.left_child {
                                         return Some(insert_ptr.clone());
                                     } else {todo!("should never reach here")}
@@ -405,7 +523,7 @@ impl<T: Ord + Clone + Debug> RBTreeNode<T> {
                             Some(_) => RBTreeNode::_recurse_node(&node_ref.right_child, key, insert),
                             None => {
                                 if insert {
-                                    node_ref.right_child = RBTreeNode::_new(key, NodeColor::Red, node_ref._ptr_self.clone());
+                                    node_ref.right_child = RBTreeNode::_new(key, NodeColor::Red, node_ref._ptr_self.clone(), false);
                                     if let Some(insert_ptr) = &node_ref.right_child {
                                         return Some(insert_ptr.clone());
                                     } else {todo!("should never reach here")}
