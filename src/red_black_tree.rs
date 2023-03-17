@@ -54,8 +54,8 @@ impl<T: Ord + Clone + Debug> RBTreeNode<T> {
 
 
     pub fn count_leaves(root: &RBTChild<T>) -> u128 {
-        if RBTreeNode::get_root_nil(root) {return 0;}
-        if RBTreeNode::is_leaf(root) {return 1;}
+        if RBTreeNode::get_root_nil(root) {return 1;}
+        //if RBTreeNode::is_leaf(root) {return 1;}
         RBTreeNode::count_leaves(&RBTreeNode::get_left(root)) + RBTreeNode::count_leaves(&RBTreeNode::get_right(root))
     }
 
@@ -533,7 +533,7 @@ impl<T: Ord + Clone + Debug> RBTreeNode<T> {
                     },
                 }
             },
-            None => {todo!("Can we change 'root' here?")},
+            None => {return None;},
         }
     }
 
