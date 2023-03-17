@@ -34,6 +34,13 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
         AVLTreeNode::_new(key, None, false)
     }
 
+    pub fn count_leaves(root: &AVLChild<T>) -> u128 {
+        if AVLTreeNode::is_leaf(root) { return 1; }
+        if AVLTreeNode::get_root_nil(root) { return 0; }
+        //if RBTreeNode::is_leaf(root) {return 1;}
+        AVLTreeNode::count_leaves(&AVLTreeNode::get_left(root)) + AVLTreeNode::count_leaves(&AVLTreeNode::get_right(root))
+    }
+
 
     fn _new(key: T, parent: AVLParent<T>, is_nil: bool) -> AVLChild<T> {
         let node = Rc::new(RefCell::new(Self { 
@@ -255,6 +262,16 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
     pub fn get_root_key(root: &AVLChild<T>) -> T {
         match root {
             Some(root_ptr) => root_ptr.borrow().key.clone(),
+            None => todo!("should never happen"),
+        }
+    }
+
+    pub fn set_root_key(root: &AVLChild<T>, key: T) {
+        match root {
+            Some(root_ptr) => {
+                let mut node_ref = root_ptr.borrow_mut();
+                node_ref.key = key;
+            },
             None => todo!("should never happen"),
         }
     }

@@ -102,10 +102,11 @@ impl<T: Ord + Clone + Debug> RedBlackTree<T> {
         let v_node = v.clone();
         match RB::get_parent(&u_node) {
             Some(_) => {
-                if RB::is_node_equal(&u_node, &RB::get_left(&RB::get_parent(&u_node))) {
-                    RB::set_child(&RB::get_parent(&u_node), v_node.clone(), Dir::Left);
-                } else {
-                    RB::set_child(&RB::get_parent(&u_node), v_node.clone(), Dir::Right);
+                if RB::is_node_equal(&u_node, &RB::get_left(&RB::get_parent(&u_node))) {  // If the u_node is a left child.
+                    RB::set_child(&RB::get_parent(&u_node), v_node.clone(), Dir::Left);  // Set the left child of u's parent
+                    // to be v. In other words, removes u and replaces it with v.
+                } else {  // u_node is a right child
+                    RB::set_child(&RB::get_parent(&u_node), v_node.clone(), Dir::Right);  // Replaces u with v
                 }
             },
             None => self.root = v_node.clone(),
