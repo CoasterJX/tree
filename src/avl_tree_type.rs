@@ -23,6 +23,10 @@ impl<T: Ord + Clone + Debug> AVLTree<T> {
         }
     }
 
+    pub fn search(&self, key: &T) -> TRoot<T> {
+        AVL::find_node(&self.root, key.clone())
+    }
+
     pub fn get_num_leaves(&mut self) -> u128 {
         if self._is_num_leaves_available {
             return self.num_leaves;
