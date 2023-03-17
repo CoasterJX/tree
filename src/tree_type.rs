@@ -248,30 +248,45 @@ impl<T: Ord + Clone + Debug> RedBlackTree<T> {
         };
         let mut z = RB::find_node(&self.root, key.clone());
 
-        while RB::get_root_color(&RB::get_parent(&z)) == NC::Red {
+        while RB::get_root_color(&RB::get_parent(&z)) == NC::Red {  // Keep looping if the current node is red
+            // The if block checks if the parent of z is a left node
             if RB::is_node_equal(
                 &RB::get_parent(&z),
                 &RB::get_left(&RB::get_parent(&RB::get_parent(&z)))
             ) {
+                /*
+                    Here we know that the parent of z is a left node. Get the uncle of z (sibling of z's parent)
+                */
                 let y = RB::get_right(&RB::get_parent(&RB::get_parent(&z)));
-                if RB::get_root_color(&y) == NC::Red {
-                    RB::set_root_color(&RB::get_parent(&z), NC::Black);
-                    RB::set_root_color(&y, NC::Black);
+                if RB::get_root_color(&y) == NC::Red {  // If z's uncle is red
+                    /*
+                        This entire if block just performs node recoloring
+                    */
+                    // The layer composed of z's parent and uncle becomes black.
+                    RB::set_root_color(&RB::get_parent(&z), NC::Black);  // Set z's parent's color to black
+                    RB::set_root_color(&y, NC::Black);  // Set z's uncle's color to black
+                    // Set z's grandparent to be re
                     RB::set_root_color(&RB::get_parent(&RB::get_parent(&z)), NC::Red);
+                    // Set z to be the grandparent
                     z = RB::get_parent(&RB::get_parent(&z));
-                } else {
+                } else {  // If z's uncle is black. Here we know that z's parent is a left node.
+                    // The if condition checks if z is a right node
                     if RB::is_node_equal(
                         &z,
                         &RB::get_right(&RB::get_parent(&z))
                     ) {
-                        z = RB::get_parent(&z);
-                        self.root = RB::left_rotate(self.root.clone(), RB::get_root_key(&z));
+                        z = RB::get_parent(&z);  // Set z to be the current node's parent
+                        self.root = RB::left_rotate(self.root.clone(), RB::get_root_key(&z));  // Perform a left rotation at z
                     }
-                    RB::set_root_color(&RB::get_parent(&z), NC::Black);
-                    RB::set_root_color(&RB::get_parent(&RB::get_parent(&z)), NC::Red);
+                    RB::set_root_color(&RB::get_parent(&z), NC::Black);  // Set z's parent's color to be black
+                    RB::set_root_color(&RB::get_parent(&RB::get_parent(&z)), NC::Red);  // Set z's grandparent's color to be red
                     self.root = RB::right_rotate(self.root.clone(), RB::get_root_key(&RB::get_parent(&RB::get_parent(&z))));
+                    // Perform a right rotation at z's grandparent
                 }
             } else {
+                /*
+                    Here we know that the parent of z is a right node. Get the uncle of z (sibling of z's parent)
+                */
                 let y = RB::get_left(&RB::get_parent(&RB::get_parent(&z)));
                 if RB::get_root_color(&y) == NC::Red {
                     RB::set_root_color(&RB::get_parent(&z), NC::Black);

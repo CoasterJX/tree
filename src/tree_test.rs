@@ -1,6 +1,8 @@
 use super::*;
 use red_black_tree::{RBTreeNode as RB, NodeColor};
 use tree_type::RedBlackTree as RBT;
+use avl_tree::{AVLTreeNode as AVL};
+use avl_tree_type::AVLTree as AVLT;
 use rand::Rng;
 
 #[test]
@@ -16,6 +18,19 @@ fn test_rb_rotate() {
     RB::print_tree(&root);
 }
 
+#[test]
+fn test_avl_rotate() {
+    let root = AVL::new(5);
+    for i in [5, 2, 10, 8, 6, 9, 12] {
+        AVL::insert_node(&root, i);
+    }
+    AVL::print_tree(&root);
+
+    // perform right rotate at 10
+    let root = AVL::left_rotate(root, 10);
+    AVL::print_tree(&root);
+}
+
 
 #[test]
 fn test_rb_insert() {
@@ -24,6 +39,15 @@ fn test_rb_insert() {
         rbt.insert(&i);
     }
     rbt.print_tree();
+}
+
+#[test]
+fn test_avl_insert() {
+    let mut avl = AVLT::<u64>::new();
+    for i in [5, 2, 10, 8, 6, 9, 12, 13] {
+        avl.insert(&i);
+    }
+    avl.print_tree();
 }
 
 #[test]
