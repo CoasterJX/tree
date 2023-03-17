@@ -38,7 +38,7 @@ fn test_avl_set_root_key() {
         AVL::insert_node(&root, i);
     }
     AVL::print_tree(&root);
-    AVL::set_root_key(&AVL::find_node(&root, 8), 7);
+    AVL::set_root_key(&AVL::find_node(&root, 15), 16);
     AVL::print_tree(&root);
 }
 
@@ -196,6 +196,40 @@ fn test_avl_delete_case3() {
     }
     avl.print_tree();
     avl.delete(&12);
+    avl.print_tree();
+}
+
+#[test]
+fn test_avl_delete_case4_min_is_leaf() {
+    /*
+        Case 4 is when the node to be deleted has both a left and right subtree. The way the delete implementation
+        works is that it replaces the current node with the smallest node in the right subtree. The smallest node in the
+        right subtree will be deleted instead. To delete the smallest node in the right subtree there are two cases
+        to consider. This test case considers the case when the smallest node in the right subtree is a leaf node.
+    */
+    let mut avl = AVLT::<u64>::new();
+    for i in [15, 12, 19, 8, 18, 23] {
+        avl.insert(&i);
+    }
+    avl.print_tree();
+    avl.delete(&15);
+    avl.print_tree();
+}
+
+#[test]
+fn test_avl_delete_case4_min_has_right_tree() {
+    /*
+        Case 4 is when the node to be deleted has both a left and right subtree. The way the delete implementation
+        works is that it replaces the current node with the smallest node in the right subtree. The smallest node in the
+        right subtree will be deleted instead. To delete the smallest node in the right subtree there are two cases
+        to consider. This test case considers the case when the smallest node in the right subtree has a right subtree.
+    */
+    let mut avl = AVLT::<u64>::new();
+    for i in [15, 12, 19, 8, 23] {
+        avl.insert(&i);
+    }
+    avl.print_tree();
+    avl.delete(&15);
     avl.print_tree();
 }
 

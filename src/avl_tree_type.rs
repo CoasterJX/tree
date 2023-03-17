@@ -43,11 +43,55 @@ impl<T: Ord + Clone + Debug> AVLTree<T> {
         AVL::set_parent(&v_node, &AVL::get_parent(&u_node));  // Set v's parent to be the parent of u.
     }
 
-    pub fn delete_fixup(&mut self, key: &T) {
+    pub fn delete_fixup(&mut self, key: T) {
         /*
             Once a node in the AVL tree got deleted the tree needs to be fixed. This is where tree rotations will be called
             to ensure the AVL tree properties are satisfied.
         */
+        let mut z = AVL::find_node(&self.root, key.clone());
+        loop {  // Infinite loop. Nothing more to say here.
+            z = AVL::get_parent(&z);  // We want to perform the tree rotations at the parent.
+
+            let bf: i64 = AVL::get_balance_factor(&z);  // This is the balance factor. This is a measure of how
+            // balanced or unbalanced the AVL tree is.
+
+            /*
+                When the AVL tree is unbalance there are four cases to consider: left-left, left-right, right-right,
+                and right-left. Please refer to this video for more information: https://www.youtube.com/watch?v=1QSYxIKXXP4
+            */
+            if bf == -2 {  // A bf of -2 means that the current tree is very left heavy
+                if AVL::get_balance_factor(&AVL::get_left(&z)) <= 0 {
+                    // Left-Left case
+                    self.root = AVL::right_rotate(self.root.clone(), AVL::get_root_key(&z));
+                    z = AVL::get_parent(&z);  // After the rotation z would be moved down one layer. This set's node z
+                    // to be the node that took it's place.
+                } else {
+                    // Left-Right case
+                    self.root = AVL::left_rotate(self.root.clone(), AVL::get_root_key(&AVL::get_left(&z)));
+                    self.root = AVL::right_rotate(self.root.clone(), AVL::get_root_key(&z));
+                    z = AVL::get_parent(&z);  // After the rotation z would be moved down one layer. This set's node z
+                    // to be the node that took it's place.
+                }
+            } else if bf == 2 {
+                if AVL::get_balance_factor(&AVL::get_right(&z)) >= 0 {
+                    // Right-Right case
+                    self.root = AVL::left_rotate(self.root.clone(), AVL::get_root_key(&z));
+                    z = AVL::get_parent(&z);  // After the rotation z would be moved down one layer. This set's node z
+                    // to be the node that took it's place.
+                } else {
+                    // Right-Left case
+                    self.root = AVL::right_rotate(self.root.clone(), AVL::get_root_key(&AVL::get_right(&z)));
+                    self.root = AVL::left_rotate(self.root.clone(), AVL::get_root_key(&z));
+                    z = AVL::get_parent(&z);  // After the rotation z would be moved down one layer. This set's node z
+                    // to be the node that took it's place.
+                }
+            }
+            if AVL::is_node_equal(&None, &z) {  // This part checks if node z is the root node. In this case we
+            // want to break ouf the infinite loop. If not we need to continue to perform tree rotations to fix
+            // the tree.
+                break;
+            }
+        }
     }
 
     pub fn delete(&mut self, key: &T) {
@@ -67,7 +111,6 @@ impl<T: Ord + Clone + Debug> AVLTree<T> {
             self.root = None;
             return;
         }
-        //AVL::solidify_all_nil(&self.root);
 
         if AVL::get_root_nil(&AVL::get_left(&z)) {  // Left subtree of z is NIL
             if AVL::get_root_nil(&AVL::get_right(&z)) {  // Right subtree of z is NIL
@@ -93,6 +136,8 @@ impl<T: Ord + Clone + Debug> AVLTree<T> {
                 let u_node = z.clone();
                 let v_node = AVL::get_right(&z);
                 self.transplant(&u_node, &v_node);
+                AVL::virtualize_all_nil(&self.root);
+                self.delete_fixup(AVL::get_root_key(&v_node));
             }
         } else {  // Left subtree of z is not NIL
             if AVL::get_root_nil(&AVL::get_right(&z)) {  // Right subtree of z is NIL
@@ -102,14 +147,40 @@ impl<T: Ord + Clone + Debug> AVLTree<T> {
                 let u_node = z.clone();
                 let v_node = AVL::get_left(&z);
                 self.transplant(&u_node, &v_node);
+                AVL::virtualize_all_nil(&self.root);
+                self.delete_fixup(AVL::get_root_key(&v_node));
             } else {  // Right subtree of z is not NIL
                 /*
                     Node to remove has both a left subtree and a right subtree.
                 */
-                let min_node = AVL::get_minimum(&z);
+                let min_node = AVL::get_minimum(&AVL::get_right(&z));
+                AVL::set_root_key(&z, AVL::get_root_key(&min_node));
+                if AVL::get_root_nil(&AVL::get_right(&min_node)) {  // min_node is a leaf node
+                    let u_node = min_node.clone();
+                    let parent_node = AVL::get_parent(&u_node);
+                    match parent_node {
+                        Some(_) => {
+                            if AVL::is_node_equal(&u_node, &AVL::get_left(&AVL::get_parent(&u_node))) {  // If the u_node is a left child.
+                                AVL::set_child_nil(&AVL::get_parent(&u_node), Dir::Left);  // Set the left child of u's parent
+                                // to be NIL. In other words, removes u.
+                            } else {  // u_node is a right child
+                                AVL::set_child_nil(&AVL::get_parent(&u_node), Dir::Right);  // Replaces u with NIL
+                            }
+                        },
+                        None => {},
+                    };
+                    AVL::virtualize_all_nil(&self.root);
+                    self.delete_fixup(AVL::get_root_key(&parent_node));
+                } else {  // min_node has a right subtree
+                    let u_node = min_node.clone();
+                    let v_node = AVL::get_right(&u_node);
+                    self.transplant(&u_node, &v_node);
+                    AVL::virtualize_all_nil(&self.root);
+                    self.delete_fixup(AVL::get_root_key(&v_node));
+                }
             }
         }
-        AVL::virtualize_all_nil(&self.root);  // The set_child_nil function doesn't actually remove the node from the AVL tree.
+        //AVL::virtualize_all_nil(&self.root);  // The set_child_nil function doesn't actually remove the node from the AVL tree.
         // Instead it sets the value of the node to be the parent node. It also sets the parent pointer to be itself. In order
         // for the node to be deallocated you need to call the virtualize_all_nil function.
     }
@@ -145,18 +216,21 @@ impl<T: Ord + Clone + Debug> AVLTree<T> {
                     // Left-Right case
                     self.root = AVL::left_rotate(self.root.clone(), AVL::get_root_key(&AVL::get_left(&z)));
                     self.root = AVL::right_rotate(self.root.clone(), AVL::get_root_key(&z));
-                    z = AVL::get_parent(&z);
+                    z = AVL::get_parent(&z);  // After the rotation z would be moved down one layer. This set's node z
+                    // to be the node that took it's place.
                 }
             } else if bf == 2 {
                 if AVL::get_balance_factor(&AVL::get_right(&z)) >= 0 {
                     // Right-Right case
                     self.root = AVL::left_rotate(self.root.clone(), AVL::get_root_key(&z));
-                    z = AVL::get_parent(&z);
+                    z = AVL::get_parent(&z);  // After the rotation z would be moved down one layer. This set's node z
+                    // to be the node that took it's place.
                 } else {
                     // Right-Left case
                     self.root = AVL::right_rotate(self.root.clone(), AVL::get_root_key(&AVL::get_right(&z)));
                     self.root = AVL::left_rotate(self.root.clone(), AVL::get_root_key(&z));
-                    z = AVL::get_parent(&z);
+                    z = AVL::get_parent(&z);  // After the rotation z would be moved down one layer. This set's node z
+                    // to be the node that took it's place.
                 }
             }
             if AVL::is_node_equal(&None, &z) {  // This part checks if node z is the root node. In this case we
