@@ -23,6 +23,10 @@ impl<T: Ord + Clone + Debug> RedBlackTree<T> {
         }
     }
 
+    pub fn search(&self, key: &T) -> TRoot<T> {
+        RB::find_node(&self.root, key.clone())
+    }
+
     pub fn is_empty(&self) -> bool {
         RB::get_root_nil(&self.root)
     }
