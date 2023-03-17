@@ -18,8 +18,8 @@ impl<T: Ord + Clone + Debug> RedBlackTree<T> {
             root: None, 
             num_leaves: 0, 
             height: 0,
-            _is_num_leaves_available: true,
-            _is_height_available: true
+            _is_num_leaves_available: false,
+            _is_height_available: false
         }
     }
 
@@ -52,6 +52,10 @@ impl<T: Ord + Clone + Debug> RedBlackTree<T> {
     }
 
     pub fn print_traverse(&self, order: Ordering) {
+        if self.is_empty() {
+            println!("-> done");
+            return;
+        }
         match order {
             Ordering::Less => {
                 Self::asc_print(&self.root);
