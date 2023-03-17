@@ -4,6 +4,7 @@ use tree_type::RedBlackTree as RBT;
 use avl_tree::{AVLTreeNode as AVL};
 use avl_tree_type::AVLTree as AVLT;
 use rand::Rng;
+use std::{fmt::Debug, cmp::Ordering};
 
 #[test]
 fn test_rb_rotate() {
@@ -249,6 +250,16 @@ fn test_avl_get_height() {
         avl.insert(&i);
     }
     assert_eq!(3, avl.get_height());
+}
+
+#[test]
+fn test_avl_print_traverse() {
+    let mut avl = AVLT::<u64>::new();
+    for i in [15, 12, 19, 8, 23] {
+        avl.insert(&i);
+    }
+    avl.print_traverse(Ordering::Greater);
+    avl.print_traverse(Ordering::Less);
 }
 
 // #[test]

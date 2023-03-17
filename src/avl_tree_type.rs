@@ -1,5 +1,5 @@
 use super::*;
-use std::fmt::Debug;
+use std::{fmt::Debug, cmp::Ordering};
 use avl_tree::{AVLTreeNode as AVL, Direction as Dir, AVLChild as TRoot};
 
 #[derive(Clone, Debug)]
@@ -39,6 +39,52 @@ impl<T: Ord + Clone + Debug> AVLTree<T> {
         self.height = AVL::get_height(&self.root);
         self._is_height_available = true;
         return self.height;
+    }
+
+    pub fn is_empty(&self) -> bool {
+        AVL::get_root_nil(&self.root)
+    }
+
+    fn asc_print(root: &TRoot<T>) {
+        let left = AVL::get_left(root);
+        if !AVL::get_root_nil(&left) {
+            Self::asc_print(&left);
+        }
+        print!("{:?} -> ", AVL::get_root_key(root));
+        let right = AVL::get_right(root);
+        if !AVL::get_root_nil(&right) {
+            Self::asc_print(&right);
+        }
+    }
+
+    fn desc_print(root: &TRoot<T>) {
+        let right = AVL::get_right(root);
+        if !AVL::get_root_nil(&right) {
+            Self::desc_print(&right);
+        }
+        print!("{:?} -> ", AVL::get_root_key(root));
+        let left = AVL::get_left(root);
+        if !AVL::get_root_nil(&left) {
+            Self::desc_print(&left);
+        }
+    }
+
+    pub fn print_traverse(&self, order: Ordering) {
+        if self.is_empty() {
+            println!("-> done");
+            return;
+        }
+        match order {
+            Ordering::Less => {
+                Self::asc_print(&self.root);
+                println!("done");
+            },
+            Ordering::Equal => println!("Choose Less or Greater please."),
+            Ordering::Greater => {
+                Self::desc_print(&self.root);
+                println!("done");
+            },
+        }
     }
 
     pub fn print_tree(&self) {
@@ -229,7 +275,7 @@ impl<T: Ord + Clone + Debug> AVLTree<T> {
             // balanced or unbalanced the AVL tree is.
 
             /*
-                When the AVL tree is unbalance there are four cases to consider: left-left, left-right, right-right,
+                When the AVL tree is unbalanced there are four cases to consider: left-left, left-right, right-right,
                 and right-left. Please refer to this video for more information: https://www.youtube.com/watch?v=1QSYxIKXXP4
             */
             if bf == -2 {  // A bf of -2 means that the current tree is very left heavy
