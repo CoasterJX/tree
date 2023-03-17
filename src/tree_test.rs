@@ -166,6 +166,28 @@ fn test_avl_delete_case1() {
     avl.print_tree();
 }
 
+#[test]
+fn test_avl_delete_case2() {
+    let mut avl = AVLT::<u64>::new();
+    for i in [15, 12, 19, 8, 23] {
+        avl.insert(&i);
+    }
+    avl.print_tree();
+    avl.delete(&19);
+    avl.print_tree();
+}
+
+#[test]
+fn test_avl_delete_case3() {
+    let mut avl = AVLT::<u64>::new();
+    for i in [15, 12, 19, 8, 23] {
+        avl.insert(&i);
+    }
+    avl.print_tree();
+    avl.delete(&12);
+    avl.print_tree();
+}
+
 // #[test]
 // fn test_rb_insert_find() {
 //     let root = RBTreeNode::new(5, NodeColor::Black, None);

@@ -90,12 +90,18 @@ impl<T: Ord + Clone + Debug> AVLTree<T> {
                 /*
                     Node to remove has a right subtree but no left subtree.
                 */
+                let u_node = z.clone();
+                let v_node = AVL::get_right(&z);
+                self.transplant(&u_node, &v_node);
             }
         } else {  // Left subtree of z is not NIL
             if AVL::get_root_nil(&AVL::get_right(&z)) {  // Right subtree of z is NIL
                 /*
                     Node to remove has a left subtree but no right subtree.
                 */
+                let u_node = z.clone();
+                let v_node = AVL::get_left(&z);
+                self.transplant(&u_node, &v_node);
             } else {  // Right subtree of z is not NIL
                 /*
                     Node to remove has both a left subtree and a right subtree.
