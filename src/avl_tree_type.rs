@@ -7,6 +7,8 @@ pub struct AVLTree<T: Ord + Clone> {
     pub root: TRoot<T>,
     pub num_leaves: u128,
     pub height: u128,
+    _is_num_leaves_available: bool,
+    _is_height_available: bool,
 }
 
 impl<T: Ord + Clone + Debug> AVLTree<T> {
@@ -15,8 +17,19 @@ impl<T: Ord + Clone + Debug> AVLTree<T> {
         AVLTree { 
             root: None, 
             num_leaves: 0, 
-            height: 0
+            height: 0,
+            _is_num_leaves_available: false,
+            _is_height_available: false
         }
+    }
+
+    pub fn get_num_leaves(&mut self) -> u128 {
+        if self._is_num_leaves_available {
+            return self.num_leaves;
+        }
+        self.num_leaves = AVL::count_leaves(&self.root);
+        self._is_num_leaves_available = true;
+        return self.num_leaves;
     }
 
     pub fn print_tree(&self) {
@@ -99,6 +112,7 @@ impl<T: Ord + Clone + Debug> AVLTree<T> {
             This function simply removes the node with value of key. This function implements the AVL tree delete
             algorithm by William Fiset shown here: https://www.youtube.com/watch?v=g4y2h70D6Nk
         */
+        self._is_num_leaves_available = false;
         let z = AVL::find_node(&self.root, key.clone());
         match z {
             None => return,
@@ -190,6 +204,7 @@ impl<T: Ord + Clone + Debug> AVLTree<T> {
             The match statement below inserts a new node with value of key into the tree. This
             does not perform any tree rotations to keep the AVL tree properties satisfied.
         */
+        self._is_num_leaves_available = false;
         match &self.root {
             Some(_) => AVL::insert_node(&self.root, key.clone()),
             None => self.root = AVL::new(key.clone()),

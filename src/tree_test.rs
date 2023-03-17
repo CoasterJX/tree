@@ -233,6 +233,15 @@ fn test_avl_delete_case4_min_has_right_tree() {
     avl.print_tree();
 }
 
+#[test]
+fn test_avl_count_leaves() {
+    let mut avl = AVLT::<u64>::new();
+    for i in [15, 12, 19, 8, 23] {
+        avl.insert(&i);
+    }
+    assert_eq!(2, avl.get_num_leaves());
+}
+
 // #[test]
 // fn test_rb_insert_find() {
 //     let root = RBTreeNode::new(5, NodeColor::Black, None);
