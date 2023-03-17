@@ -32,6 +32,15 @@ impl<T: Ord + Clone + Debug> AVLTree<T> {
         return self.num_leaves;
     }
 
+    pub fn get_height(&mut self) -> u128 {
+        if self._is_height_available {
+            return self.height;
+        }
+        self.height = AVL::get_height(&self.root);
+        self._is_height_available = true;
+        return self.height;
+    }
+
     pub fn print_tree(&self) {
         AVL::print_tree(&self.root)
     }
@@ -113,6 +122,7 @@ impl<T: Ord + Clone + Debug> AVLTree<T> {
             algorithm by William Fiset shown here: https://www.youtube.com/watch?v=g4y2h70D6Nk
         */
         self._is_num_leaves_available = false;
+        self._is_height_available = false;
         let z = AVL::find_node(&self.root, key.clone());
         match z {
             None => return,
@@ -205,6 +215,7 @@ impl<T: Ord + Clone + Debug> AVLTree<T> {
             does not perform any tree rotations to keep the AVL tree properties satisfied.
         */
         self._is_num_leaves_available = false;
+        self._is_height_available = false;
         match &self.root {
             Some(_) => AVL::insert_node(&self.root, key.clone()),
             None => self.root = AVL::new(key.clone()),
