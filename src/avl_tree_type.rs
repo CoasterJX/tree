@@ -106,6 +106,7 @@ impl<T: Ord + Clone + Debug> AVLTree<T> {
                 /*
                     Node to remove has both a left subtree and a right subtree.
                 */
+                let min_node = AVL::get_minimum(&z);
             }
         }
         AVL::virtualize_all_nil(&self.root);  // The set_child_nil function doesn't actually remove the node from the AVL tree.

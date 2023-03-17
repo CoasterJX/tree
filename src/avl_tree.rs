@@ -259,6 +259,16 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
         }
     }
 
+    pub fn set_root_key(root: &AVLChild<T>, key: T) {
+        match root {
+            Some(root_ptr) => {
+                let mut node_ref = root_ptr.borrow_mut();
+                node_ref.key = key;
+            },
+            None => todo!("should never happen"),
+        }
+    }
+
     pub fn get_root_nil(root: &AVLChild<T>) -> bool {
         match root {
             Some(target_ptr) => target_ptr.borrow().is_nil.clone(),

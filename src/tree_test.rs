@@ -31,6 +31,17 @@ fn test_avl_rotate() {
     AVL::print_tree(&root);
 }
 
+#[test]
+fn test_avl_set_root_key() {
+    let root = AVL::new(15);
+    for i in [12, 19, 8, 23] {
+        AVL::insert_node(&root, i);
+    }
+    AVL::print_tree(&root);
+    AVL::set_root_key(&AVL::find_node(&root, 8), 7);
+    AVL::print_tree(&root);
+}
+
 
 #[test]
 fn test_rb_insert() {
