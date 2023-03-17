@@ -23,7 +23,7 @@ fn invalid(cmd: &Vec<&str>, size: usize) -> bool {
     return cmd.len() < size
 }
 
-fn exec_cmd<T: Ord + Clone + Debug + FromStr>(tree: &mut RBT<T>, cmd: &str) where <T as FromStr>::Err: Debug {
+fn exec_cmd_rb<T: Ord + Clone + Debug + FromStr>(tree: &mut RBT<T>, cmd: &str) where <T as FromStr>::Err: Debug {
     let c = cmd.trim().split(" ").collect::<Vec<&str>>();
     match c[0] {
         "insert" => {
@@ -72,18 +72,17 @@ fn log(str: &str) {
     println!("| {:?}", str);
 }
 
-fn start_demo<T: Ord + Clone + Debug + FromStr>(rbt: &mut RBT<T>) where <T as FromStr>::Err: Debug {
+fn start_demo_rb<T: Ord + Clone + Debug + FromStr>(rbt: &mut RBT<T>) where <T as FromStr>::Err: Debug {
     loop {
         print!(">>> ");
         io::stdout().flush().unwrap();
         let mut line = String::new();
         let _ = io::stdin().read_line(&mut line).unwrap();
-        exec_cmd(rbt, &line);
+        exec_cmd_rb(rbt, &line);
     }
 }
 
-fn main() {
-    welcome();
+fn rb_main() {
     let mut key_type = String::new(); 
     print!("Decide the type of tree key: ");
     io::stdout().flush().unwrap();
@@ -92,12 +91,46 @@ fn main() {
     match key_type.trim() {
         "int" => {
             let mut rbt: RBT<i128> = RBT::new();
-            start_demo(&mut rbt);
+            start_demo_rb(&mut rbt);
         },
         "str" => {
             let mut rbt: RBT<String> = RBT::new();
-            start_demo(&mut rbt);
+            start_demo_rb(&mut rbt);
         }
         _ => println!("Type not implemented in this demo but should work in real case.")
+    }
+}
+
+fn avl_main() {
+    let mut key_type = String::new(); 
+    print!("Decide the type of tree key: ");
+    io::stdout().flush().unwrap();
+    let _ = io::stdin().read_line(&mut key_type).unwrap();
+    
+    match key_type.trim() {
+        "int" => {
+            let mut rbt: RBT<i128> = RBT::new();
+            start_demo_rb(&mut rbt);
+        },
+        "str" => {
+            let mut rbt: RBT<String> = RBT::new();
+            start_demo_rb(&mut rbt);
+        }
+        _ => println!("Type not implemented in this demo but should work in real case.")
+    }
+}
+
+fn main() {
+    welcome();
+
+    let mut tree_type = String::new();
+    print!("Decide the type of tree (1.red-black  2.AVL): ");
+    io::stdout().flush().unwrap();
+    let _ = io::stdin().read_line(&mut tree_type).unwrap();
+
+    match tree_type.trim() {
+        "1" => rb_main(),
+        "2" => avl_main(),
+        _ => println!("Invalid selection.")
     }
 }
