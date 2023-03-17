@@ -169,19 +169,11 @@ fn test_rb_transplant4() {
 
 #[test]
 fn test_avl_delete_case1() {
+    /*
+        Case 1 is when the node being deleted is a leaf node.
+    */
     let mut avl = AVLT::<u64>::new();
-    for i in [15, 12, 19, 8, 23] {
-        avl.insert(&i);
-    }
-    avl.print_tree();
-    avl.delete(&8);
-    avl.print_tree();
-}
-
-#[test]
-fn test_avl_delete_case2() {
-    let mut avl = AVLT::<u64>::new();
-    for i in [15, 12, 19, 8, 23] {
+    for i in [11, 31, 18, 2, 1, 33, 28, 4, 3, 7, 5, 25, 20, 19, 15, 12, 14, 29] {
         avl.insert(&i);
     }
     avl.print_tree();
@@ -190,13 +182,30 @@ fn test_avl_delete_case2() {
 }
 
 #[test]
-fn test_avl_delete_case3() {
+fn test_avl_delete_case2() {
+    /*
+        Case 2 is when the node being deleted has a right subtree but no left subtree.
+    */
     let mut avl = AVLT::<u64>::new();
-    for i in [15, 12, 19, 8, 23] {
+    for i in [11, 31, 18, 2, 1, 33, 28, 4, 3, 7, 5, 25, 20, 19, 15, 12, 14, 29] {
         avl.insert(&i);
     }
     avl.print_tree();
-    avl.delete(&12);
+    avl.delete(&28);
+    avl.print_tree();
+}
+
+#[test]
+fn test_avl_delete_case3() {
+    /*
+        Case 3 is when the node being deleted has a left subtree but no right subtree.
+    */
+    let mut avl = AVLT::<u64>::new();
+    for i in [11, 31, 18, 2, 1, 33, 28, 4, 3, 7, 5, 25, 20, 19, 15, 12, 14, 29] {
+        avl.insert(&i);
+    }
+    avl.print_tree();
+    avl.delete(&20);
     avl.print_tree();
 }
 
@@ -209,11 +218,11 @@ fn test_avl_delete_case4_min_is_leaf() {
         to consider. This test case considers the case when the smallest node in the right subtree is a leaf node.
     */
     let mut avl = AVLT::<u64>::new();
-    for i in [15, 12, 19, 8, 18, 23] {
+    for i in [11, 31, 18, 2, 1, 33, 28, 4, 3, 7, 5, 25, 20, 19, 15, 12, 14, 29] {
         avl.insert(&i);
     }
     avl.print_tree();
-    avl.delete(&15);
+    avl.delete(&18);
     avl.print_tree();
 }
 
@@ -226,11 +235,11 @@ fn test_avl_delete_case4_min_has_right_tree() {
         to consider. This test case considers the case when the smallest node in the right subtree has a right subtree.
     */
     let mut avl = AVLT::<u64>::new();
-    for i in [15, 12, 19, 8, 23] {
+    for i in [11, 31, 18, 2, 1, 33, 28, 4, 3, 7, 5, 25, 20, 19, 15, 12, 14, 29] {
         avl.insert(&i);
     }
     avl.print_tree();
-    avl.delete(&15);
+    avl.delete(&25);
     avl.print_tree();
 }
 

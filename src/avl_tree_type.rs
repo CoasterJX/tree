@@ -188,13 +188,20 @@ impl<T: Ord + Clone + Debug> AVLTree<T> {
                     Node to remove is a leaf node.
                 */
                 let u_node = z.clone();
-                match AVL::get_parent(&u_node) {
+                let v_node = AVL::get_parent(&u_node);  // The reason I need to store the parent of u_node is so that I
+                // could perform tree rotations later. The tree rotations need to be performed to keep the AVL tree
+                // properties satisfied.
+                match v_node {
                     Some(_) => {
-                        if AVL::is_node_equal(&u_node, &AVL::get_left(&AVL::get_parent(&u_node))) {  // If the u_node is a left child.
-                            AVL::set_child_nil(&AVL::get_parent(&u_node), Dir::Left);  // Set the left child of u's parent
+                        if AVL::is_node_equal(&u_node, &AVL::get_left(&v_node)) {  // If the u_node is a left child.
+                            AVL::set_child_nil(&v_node, Dir::Left);  // Set the left child of u's parent
                             // to be NIL. In other words, removes u.
+                            AVL::virtualize_all_nil(&self.root);
+                            self.delete_fixup(AVL::get_root_key(&v_node));
                         } else {  // u_node is a right child
-                            AVL::set_child_nil(&AVL::get_parent(&u_node), Dir::Right);  // Replaces u with NIL
+                            AVL::set_child_nil(&v_node, Dir::Right);  // Replaces u with NIL
+                            AVL::virtualize_all_nil(&self.root);
+                            self.delete_fixup(AVL::get_root_key(&v_node));
                         }
                     },
                     None => {},
@@ -230,11 +237,11 @@ impl<T: Ord + Clone + Debug> AVLTree<T> {
                     let parent_node = AVL::get_parent(&u_node);
                     match parent_node {
                         Some(_) => {
-                            if AVL::is_node_equal(&u_node, &AVL::get_left(&AVL::get_parent(&u_node))) {  // If the u_node is a left child.
-                                AVL::set_child_nil(&AVL::get_parent(&u_node), Dir::Left);  // Set the left child of u's parent
+                            if AVL::is_node_equal(&u_node, &AVL::get_left(&parent_node)) {  // If the u_node is a left child.
+                                AVL::set_child_nil(&parent_node, Dir::Left);  // Set the left child of u's parent
                                 // to be NIL. In other words, removes u.
                             } else {  // u_node is a right child
-                                AVL::set_child_nil(&AVL::get_parent(&u_node), Dir::Right);  // Replaces u with NIL
+                                AVL::set_child_nil(&parent_node, Dir::Right);  // Replaces u with NIL
                             }
                         },
                         None => {},
