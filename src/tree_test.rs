@@ -262,6 +262,17 @@ fn test_avl_print_traverse() {
     avl.print_traverse(Ordering::Less);
 }
 
+#[test]
+fn test_avl_check_empty() {
+    let mut avl = AVLT::<u64>::new();
+    assert_eq!(true, avl.is_empty());
+
+    for i in [15, 12, 19, 8, 23] {
+        avl.insert(&i);
+    }
+    assert_eq!(false, avl.is_empty());
+}
+
 // #[test]
 // fn test_rb_insert_find() {
 //     let root = RBTreeNode::new(5, NodeColor::Black, None);
