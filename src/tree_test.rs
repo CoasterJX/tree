@@ -281,6 +281,12 @@ fn test_avl_delete_only_root_left() {
 }
 
 #[test]
+fn test_avl_delete_empty() {
+    let mut avl = AVLT::<u64>::new();
+    avl.delete(&1);
+}
+
+#[test]
 fn test_avl_count_leaves() {
     let mut avl = AVLT::<u64>::new();
     for i in [15, 12, 19, 8, 23] {
