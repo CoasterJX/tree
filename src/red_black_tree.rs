@@ -9,16 +9,6 @@ pub enum NodeColor {
     Black,
 }
 
-impl NodeColor {
-
-    pub fn recolor(&mut self) {
-        match &self {
-            NodeColor::Red => *self = NodeColor::Black,
-            NodeColor::Black => *self = NodeColor::Red,
-        }
-    }
-}
-
 #[derive(PartialEq)]
 pub enum Direction {
     Left,
