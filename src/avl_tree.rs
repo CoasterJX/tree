@@ -114,7 +114,7 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
     }
 
 
-    fn to_string(direction: &Direction, parent: &AVLChild<T>, key: &T, height: u128, extra: &str) {
+    fn to_string(direction: &Direction, parent: &AVLChild<T>, key: &T, extra: &str) {
         let direction_str = match direction {
             Direction::Left => "<──",
             Direction::Right => "──>",
@@ -125,8 +125,8 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
 
         println!("{}", extra);
         println!(
-            "{}{}(key {:?}, parent {:?}, height {:?})", 
-            extra, direction_str, key, parent_key, height);
+            "{}{}(key {:?}, parent {:?})", 
+            extra, direction_str, key, parent_key);
     }
 
 
@@ -138,7 +138,6 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
                     &direction, 
                     &AVLTreeNode::get_parent(&root),
                     &node_ref.key,
-                    AVLTreeNode::get_height(&root),
                     extra);
                 
                 let (left_child, right_child) = (&node_ref.left_child, &node_ref.right_child);

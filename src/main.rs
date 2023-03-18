@@ -109,37 +109,37 @@ fn exec_cmd_avl<T: Ord + Clone + Debug + FromStr>(tree: &mut AVL<T>, cmd: &str) 
                 tree.insert(&key);
             }
         },
-        // "delete" => {
-        //     if invalid(&c, 2) {return;}
-        //     for i in 1..c.len() {
-        //         let key = c[i].parse().unwrap();
-        //         tree.delete(&key);
-        //     }
-        // },
-        // "count-leaves" => {
-        //     if invalid(&c, 1) {return;}
-        //     println!("{:?}", tree.get_num_leaves());
-        // },
-        // "height" => {
-        //     if invalid(&c, 1) {return;}
-        //     println!("{:?}", tree.get_height());
-        // },
-        // "is-empty" => {
-        //     if invalid(&c, 1) {return;}
-        //     println!("{:?}", tree.is_empty());
-        // },
+        "delete" => {
+            if invalid(&c, 2) {return;}
+            for i in 1..c.len() {
+                let key = c[i].parse().unwrap();
+                tree.delete(&key);
+            }
+        },
+        "count-leaves" => {
+            if invalid(&c, 1) {return;}
+            println!("{:?}", tree.get_num_leaves());
+        },
+        "height" => {
+            if invalid(&c, 1) {return;}
+            println!("{:?}", tree.get_height());
+        },
+        "is-empty" => {
+            if invalid(&c, 1) {return;}
+            println!("{:?}", tree.is_empty());
+        },
         "print" => {
             if invalid(&c, 1) {return;}
             tree.print_tree();
         },
-        // "traverse" => {
-        //     if invalid(&c, 2) {return;}
-        //     match c[1] {
-        //         "asc" => tree.print_traverse(std::cmp::Ordering::Less),
-        //         "desc" => tree.print_traverse(std::cmp::Ordering::Greater),
-        //         _ => println!("Invalid traverse option."),
-        //     };
-        // },
+        "traverse" => {
+            if invalid(&c, 2) {return;}
+            match c[1] {
+                "asc" => tree.print_traverse(std::cmp::Ordering::Less),
+                "desc" => tree.print_traverse(std::cmp::Ordering::Greater),
+                _ => println!("Invalid traverse option."),
+            };
+        },
         _ => println!("Invalid command: {}", cmd),
     }
 }
