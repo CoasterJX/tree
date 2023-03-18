@@ -70,7 +70,7 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
             //AVLTreeNode::get_height(&AVLTreeNode::get_right(root))
         //)
         match root {
-            Some(root_ptr) => root_ptr.borrow().height.clone(),
+            Some(root_ptr) => root_ptr.borrow().height,
             None => todo!("should never happen"),
         } 
     }
@@ -83,9 +83,9 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
                     //Some(parent_ptr) => node_ref.parent = parent_ptr.borrow()._ptr_self.clone(),
                     //None => node_ref.parent = None,
                 //}
-                node_ref.height = height;
+                node_ref.height = height.clone();
             },
-            None => todo!("not supported"),
+            None => {},
         }
     }
 
@@ -114,7 +114,7 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
     }
 
 
-    fn to_string(direction: &Direction, parent: &AVLChild<T>, key: &T, extra: &str) {
+    fn to_string(direction: &Direction, parent: &AVLChild<T>, key: &T, height: u128, extra: &str) {
         let direction_str = match direction {
             Direction::Left => "<──",
             Direction::Right => "──>",
@@ -125,8 +125,8 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
 
         println!("{}", extra);
         println!(
-            "{}{}(key {:?}, parent {:?})", 
-            extra, direction_str, key, parent_key);
+            "{}{}(key {:?}, parent {:?}, height {:?})", 
+            extra, direction_str, key, parent_key, height);
     }
 
 
@@ -137,7 +137,8 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
                 AVLTreeNode::to_string(
                     &direction, 
                     &AVLTreeNode::get_parent(&root),
-                    &node_ref.key, 
+                    &node_ref.key,
+                    AVLTreeNode::get_height(&root),
                     extra);
                 
                 let (left_child, right_child) = (&node_ref.left_child, &node_ref.right_child);
@@ -207,7 +208,11 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
                 AVLTreeNode::set_parent(&y, &AVLTreeNode::get_parent(&x));
 
                 AVLTreeNode::set_parent(&x, &y);
-                AVLTreeNode::set_child(&y, x, Direction::Left);
+                let z = x.clone();
+                AVLTreeNode::set_child(&y, z, Direction::Left);
+
+                AVLTreeNode::update_height(&x);
+                AVLTreeNode::update_height(&y);
 
                 return y; // this y must be used to set the parent's left or right
 
@@ -262,7 +267,11 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
                 AVLTreeNode::set_parent(&y, &AVLTreeNode::get_parent(&x));
 
                 AVLTreeNode::set_parent(&x, &y);
-                AVLTreeNode::set_child(&y, x, Direction::Right);
+                let z = x.clone();
+                AVLTreeNode::set_child(&y, z, Direction::Right);
+
+                AVLTreeNode::update_height(&x);
+                AVLTreeNode::update_height(&y);
 
                 return y; // this y must be used to set the parent's left or right
 
@@ -476,7 +485,7 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
 
                     Ordering::Less => {
                         match node_ref.left_child {
-                            Some(_) => AVLTreeNode::_recurse_node(&node_ref.left_child, key, insert),
+                            Some(_) => AVLTreeNode::_recurse_node(&node_ref.left_child, key, insert).clone(),
                             None => {
                                 if insert {
                                     node_ref.left_child = AVLTreeNode::_new(key, node_ref._ptr_self.clone(), false);
@@ -491,7 +500,7 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
                     Ordering::Equal => return Some(tree_ptr.clone()),
                     Ordering::Greater => {
                         match node_ref.right_child {
-                            Some(_) => AVLTreeNode::_recurse_node(&node_ref.right_child, key, insert),
+                            Some(_) => AVLTreeNode::_recurse_node(&node_ref.right_child, key, insert).clone(),
                             None => {
                                 if insert {
                                     node_ref.right_child = AVLTreeNode::_new(key, node_ref._ptr_self.clone(), false);

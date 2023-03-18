@@ -61,8 +61,8 @@ fn test_avl_node_get_height() {
 #[test]
 fn test_avl_node_set_height() {
     let root = AVL::new(15);
-    AVL::set_height(&root, 1);
-    assert_eq!(1, AVL::get_height(&root));
+    AVL::set_height(&root, 3);
+    assert_eq!(3, AVL::get_height(&root));
 }
 
 #[test]

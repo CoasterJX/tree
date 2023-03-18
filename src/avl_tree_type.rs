@@ -123,7 +123,8 @@ impl<T: Ord + Clone + Debug> AVLTree<T> {
         let mut z = AVL::find_node(&self.root, key.clone());
         loop {  // Infinite loop. Nothing more to say here.
             z = AVL::get_parent(&z);  // We want to perform the tree rotations at the parent.
-
+            AVL::update_height(&z);  // After a node gets deleted the height of affected nodes needs to be changed. The left
+            // and right rotation functions already take care of updating the height.
             let bf: i64 = AVL::get_balance_factor(&z);  // This is the balance factor. This is a measure of how
             // balanced or unbalanced the AVL tree is.
 
@@ -251,6 +252,7 @@ impl<T: Ord + Clone + Debug> AVLTree<T> {
                         None => {},
                     };
                     AVL::virtualize_all_nil(&self.root);
+                    AVL::update_height(&parent_node);
                     self.delete_fixup(AVL::get_root_key(&parent_node));
                 } else {  // min_node has a right subtree
                     let u_node = min_node.clone();
@@ -281,6 +283,8 @@ impl<T: Ord + Clone + Debug> AVLTree<T> {
         
         loop {  // Infinite loop. Nothing more to say here.
             z = AVL::get_parent(&z);  // We want to perform the tree rotations at the parent.
+            AVL::update_height(&z);  // After a node gets inserted the height of affected nodes needs to be changed. The left
+            // and right rotation functions already take care of updating the height.
 
             let bf: i64 = AVL::get_balance_factor(&z);  // This is the balance factor. This is a measure of how
             // balanced or unbalanced the AVL tree is.
