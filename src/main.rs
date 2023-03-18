@@ -105,6 +105,14 @@ fn exec_cmd_avl<T: Ord + Clone + Debug + FromStr>(tree: &mut AVL<T>, cmd: &str) 
         "insert" => {
             if invalid(&c, 2) {return;}
             for i in 1..c.len() {
+                let mut valid = true;
+                c[i].parse().unwrap_or_else(|_| -> usize {
+                    valid = false; 0
+                });
+                if !valid {
+                    println!("{:?} is not a valid key to insert", c[i]);
+                    continue;
+                }
                 let key = c[i].parse().unwrap();
                 tree.insert(&key);
             }
@@ -112,6 +120,13 @@ fn exec_cmd_avl<T: Ord + Clone + Debug + FromStr>(tree: &mut AVL<T>, cmd: &str) 
         "delete" => {
             if invalid(&c, 2) {return;}
             for i in 1..c.len() {
+                let mut valid = true;
+                c[i].parse().unwrap_or_else(|_| -> usize {
+                    valid = false; 0
+                });
+                if !valid {
+                    continue;
+                }
                 let key = c[i].parse().unwrap();
                 tree.delete(&key);
             }
