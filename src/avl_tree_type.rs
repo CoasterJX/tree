@@ -242,12 +242,8 @@ impl<T: Ord + Clone + Debug> AVLTree<T> {
                     let parent_node = AVL::get_parent(&u_node);
                     match parent_node {
                         Some(_) => {
-                            if AVL::is_node_equal(&u_node, &AVL::get_left(&parent_node)) {  // If the u_node is a left child.
-                                AVL::set_child_nil(&parent_node, Dir::Left);  // Set the left child of u's parent
-                                // to be NIL. In other words, removes u.
-                            } else {  // u_node is a right child
-                                AVL::set_child_nil(&parent_node, Dir::Right);  // Replaces u with NIL
-                            }
+                            AVL::set_child_nil(&parent_node, Dir::Left);  // Set the left child of u's parent
+                            // to be NIL. In other words, removes u.
                         },
                         None => {},
                     };

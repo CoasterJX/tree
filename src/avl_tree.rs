@@ -512,7 +512,7 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
                     },
                 }
             },
-            None => {todo!("Can we change 'root' here?")},
+            None => {return None;},
         }
     }
 }
