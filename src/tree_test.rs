@@ -20,7 +20,7 @@ fn test_rb_rotate() {
 }
 
 #[test]
-fn test_avl_rotate() {
+fn test_avl_left_rotate() {
     let root = AVL::new(5);
     for i in [5, 2, 10, 8, 6, 9, 12] {
         AVL::insert_node(&root, i);
@@ -33,6 +33,15 @@ fn test_avl_rotate() {
 }
 
 #[test]
+fn test_avl_right_rotate() {
+    let root = AVL::new(5);
+    for i in [5, 2, 10, 8, 6, 9, 12] {
+        AVL::insert_node(&root, i);
+    }
+    AVL::print_tree(&root);
+}
+
+#[test]
 fn test_avl_set_root_key() {
     let root = AVL::new(15);
     for i in [12, 19, 8, 23] {
@@ -41,6 +50,25 @@ fn test_avl_set_root_key() {
     AVL::print_tree(&root);
     AVL::set_root_key(&AVL::find_node(&root, 15), 16);
     AVL::print_tree(&root);
+}
+
+#[test]
+fn test_avl_node_get_height() {
+    let root = AVL::new(15);
+    assert_eq!(1, AVL::get_height(&root));
+}
+
+#[test]
+fn test_avl_node_set_height() {
+    let root = AVL::new(15);
+    AVL::set_height(&root, 1);
+    assert_eq!(1, AVL::get_height(&root));
+}
+
+#[test]
+fn test_avl_node_update_height() {
+    let root = AVL::new(15);
+    assert_eq!(1, AVL::get_height(&root));
 }
 
 
@@ -240,6 +268,15 @@ fn test_avl_delete_case4_min_has_right_tree() {
     }
     avl.print_tree();
     avl.delete(&25);
+    avl.print_tree();
+}
+
+#[test]
+fn test_avl_delete_only_root_left() {
+    let mut avl = AVLT::<u64>::new();
+    avl.insert(&1);
+    avl.print_tree();
+    avl.delete(&1);
     avl.print_tree();
 }
 

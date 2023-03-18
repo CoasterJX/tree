@@ -20,7 +20,8 @@ pub struct AVLTreeNode<T: Ord + Clone> {
     left_child: AVLChild<T>,
     right_child: AVLChild<T>,
     pub _ptr_self: AVLParent<T>,
-    pub is_nil: bool
+    pub is_nil: bool,
+    pub height: u128,
 }
 
 impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
@@ -50,6 +51,7 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
             right_child: None,
             _ptr_self: None,
             is_nil,
+            height: 1
         }));
 
         let weak_ptr = Rc::downgrade(&node);
@@ -63,10 +65,35 @@ impl<T: Ord + Clone + Debug> AVLTreeNode<T> {
 
     pub fn get_height(root: &AVLChild<T>) -> u128 {
         if AVLTreeNode::get_root_nil(root) {return 0;}
-        1 + max(
+        //1 + max(
+            //AVLTreeNode::get_height(&AVLTreeNode::get_left(root)),
+            //AVLTreeNode::get_height(&AVLTreeNode::get_right(root))
+        //)
+        match root {
+            Some(root_ptr) => root_ptr.borrow().height.clone(),
+            None => todo!("should never happen"),
+        } 
+    }
+
+    pub fn set_height(root: &AVLChild<T>, height: u128) {
+        match root {
+            Some(root_ptr) => {
+                let mut node_ref = root_ptr.borrow_mut();
+                //match parent {
+                    //Some(parent_ptr) => node_ref.parent = parent_ptr.borrow()._ptr_self.clone(),
+                    //None => node_ref.parent = None,
+                //}
+                node_ref.height = height;
+            },
+            None => todo!("not supported"),
+        }
+    }
+
+    pub fn update_height(root: &AVLChild<T>) {
+        AVLTreeNode::set_height(root, 1 + max(
             AVLTreeNode::get_height(&AVLTreeNode::get_left(root)),
             AVLTreeNode::get_height(&AVLTreeNode::get_right(root))
-        )
+        ))
     }
 
     pub fn get_balance_factor(root: &AVLChild<T>) -> i64 {
