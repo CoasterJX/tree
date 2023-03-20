@@ -308,7 +308,7 @@ impl<T: Ord + Clone + Debug> RBTreeNode<T> {
     pub fn set_root_color(root: &RBTChild<T>, color: NodeColor) {
         match root {
             Some(root_ptr) => root_ptr.borrow_mut().color = color,
-            None => todo!("should never happen"),
+            None => (),
         }
     }
 

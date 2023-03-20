@@ -4,6 +4,7 @@ use tree_type::RedBlackTree as RBT;
 use avl_tree::{AVLTreeNode as AVL};
 use avl_tree_type::AVLTree as AVLT;
 use rand::Rng;
+use rand::seq::SliceRandom;
 use std::{fmt::Debug, cmp::Ordering};
 
 #[test]
@@ -111,14 +112,19 @@ fn test_pressure() {
     let mut rbt = RBT::<u64>::new();
     let mut rng = rand::thread_rng();
     let mut inserted = vec![];
-    for _ in 0..10000 {
-        let a = rng.gen_range(0..100000);
+    for _ in 0..1000000 {
+        let a = rng.gen_range(0..10000000);
         rbt.insert(&a);
         inserted.append(&mut vec![a]);
+        //println!("{:?}", a);
     }
+    // inserted.sort();
+    // inserted.dedup();
+    // inserted.shuffle(&mut rand::thread_rng());
     for i in inserted {
         rbt.delete(&i);
     }
+    rbt.print_traverse(Ordering::Less);
     rbt.print_tree();
 }
 
