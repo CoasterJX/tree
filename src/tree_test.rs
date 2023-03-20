@@ -118,9 +118,9 @@ fn test_pressure() {
         inserted.append(&mut vec![a]);
         //println!("{:?}", a);
     }
-    inserted.sort();
-    inserted.dedup();
-    inserted.shuffle(&mut rand::thread_rng());
+    // inserted.sort();
+    // inserted.dedup();
+    // inserted.shuffle(&mut rand::thread_rng());
     for i in inserted {
         rbt.delete(&i);
     }

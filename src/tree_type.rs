@@ -214,7 +214,7 @@ impl<T: Ord + Clone + Debug> RedBlackTree<T> {
 
         //RB::print_tree(&z);
         //RB::solidify_all_nil(&self.root);
-        let mut x: TRoot<T> = None;
+        let x: TRoot<T>;
         let mut y = z.clone();
         let mut y_orig_color = RB::get_root_color(&y);
 
