@@ -99,6 +99,51 @@ fn exec_cmd_rb<T: Ord + Clone + Debug + FromStr>(tree: &mut RBT<T>, cmd: &str) w
     }
 }
 
+fn exec_cmd_rb_string(tree: &mut RBT<String>, cmd: &str) {
+    let c = cmd.trim().split(" ").collect::<Vec<&str>>();
+    match c[0] {
+        "insert" => {
+            if invalid(&c, 2) {return;}
+            for i in 1..c.len() {
+                let key = c[i].to_string();
+                tree.insert(&key);
+            }
+        },
+        "delete" => {
+            if invalid(&c, 2) {return;}
+            for i in 1..c.len() {
+                let key = c[i].to_string();
+                tree.delete(&key);
+            }
+        },
+        "count-leaves" => {
+            if invalid(&c, 1) {return;}
+            println!("{:?}", tree.get_num_leaves());
+        },
+        "height" => {
+            if invalid(&c, 1) {return;}
+            println!("{:?}", tree.get_height());
+        },
+        "is-empty" => {
+            if invalid(&c, 1) {return;}
+            println!("{:?}", tree.is_empty());
+        },
+        "print" => {
+            if invalid(&c, 1) {return;}
+            tree.print_tree();
+        },
+        "traverse" => {
+            if invalid(&c, 2) {return;}
+            match c[1] {
+                "asc" => tree.print_traverse(std::cmp::Ordering::Less),
+                "desc" => tree.print_traverse(std::cmp::Ordering::Greater),
+                _ => println!("Invalid traverse option."),
+            };
+        },
+        _ => println!("Invalid command: {}", cmd),
+    }
+}
+
 fn exec_cmd_avl<T: Ord + Clone + Debug + FromStr>(tree: &mut AVL<T>, cmd: &str) where <T as FromStr>::Err: Debug {
     let c = cmd.trim().split(" ").collect::<Vec<&str>>();
     match c[0] {
@@ -159,6 +204,51 @@ fn exec_cmd_avl<T: Ord + Clone + Debug + FromStr>(tree: &mut AVL<T>, cmd: &str) 
     }
 }
 
+fn exec_cmd_avl_string(tree: &mut AVL<String>, cmd: &str) {
+    let c = cmd.trim().split(" ").collect::<Vec<&str>>();
+    match c[0] {
+        "insert" => {
+            if invalid(&c, 2) {return;}
+            for i in 1..c.len() {
+                let key = c[i].to_string();
+                tree.insert(&key);
+            }
+        },
+        "delete" => {
+            if invalid(&c, 2) {return;}
+            for i in 1..c.len() {
+                let key = c[i].to_string();
+                tree.delete(&key);
+            }
+        },
+        "count-leaves" => {
+            if invalid(&c, 1) {return;}
+            println!("{:?}", tree.get_num_leaves());
+        },
+        "height" => {
+            if invalid(&c, 1) {return;}
+            println!("{:?}", tree.get_height());
+        },
+        "is-empty" => {
+            if invalid(&c, 1) {return;}
+            println!("{:?}", tree.is_empty());
+        },
+        "print" => {
+            if invalid(&c, 1) {return;}
+            tree.print_tree();
+        },
+        "traverse" => {
+            if invalid(&c, 2) {return;}
+            match c[1] {
+                "asc" => tree.print_traverse(std::cmp::Ordering::Less),
+                "desc" => tree.print_traverse(std::cmp::Ordering::Greater),
+                _ => println!("Invalid traverse option."),
+            };
+        },
+        _ => println!("Invalid command: {}", cmd),
+    }
+}
+
 fn log(str: &str) {
     println!("| {:?}", str);
 }
@@ -174,6 +264,17 @@ fn start_demo_rb<T: Ord + Clone + Debug + FromStr>(rbt: &mut RBT<T>) where <T as
     }
 }
 
+fn start_demo_rb_string(rbt: &mut RBT<String>) {
+    user_manual();
+    loop {
+        print!(">>> ");
+        io::stdout().flush().unwrap();
+        let mut line = String::new();
+        let _ = io::stdin().read_line(&mut line).unwrap();
+        exec_cmd_rb_string(rbt, &line);
+    }
+}
+
 fn start_demo_avl<T: Ord + Clone + Debug + FromStr>(avl: &mut AVL<T>) where <T as FromStr>::Err: Debug {
     user_manual();
     loop {
@@ -182,6 +283,17 @@ fn start_demo_avl<T: Ord + Clone + Debug + FromStr>(avl: &mut AVL<T>) where <T a
         let mut line = String::new();
         let _ = io::stdin().read_line(&mut line).unwrap();
         exec_cmd_avl(avl, &line);
+    }
+}
+
+fn start_demo_avl_string(avl: &mut AVL<String>) {
+    user_manual();
+    loop {
+        print!(">>> ");
+        io::stdout().flush().unwrap();
+        let mut line = String::new();
+        let _ = io::stdin().read_line(&mut line).unwrap();
+        exec_cmd_avl_string(avl, &line);
     }
 }
 
@@ -198,7 +310,7 @@ fn rb_main() {
         },
         "str" => {
             let mut rbt: RBT<String> = RBT::new();
-            start_demo_rb(&mut rbt);
+            start_demo_rb_string(&mut rbt);
         }
         _ => println!("Type not implemented in this demo but should work in real case.")
     }
@@ -217,7 +329,7 @@ fn avl_main() {
         },
         "str" => {
             let mut avl: AVL<String> = AVL::new();
-            start_demo_avl(&mut avl);
+            start_demo_avl_string(&mut avl);
         }
         _ => println!("Type not implemented in this demo but should work in real case.")
     }
