@@ -200,7 +200,9 @@ impl<T: Ord + Clone + Debug> RedBlackTree<T> {
         self._is_height_available = false;
         let z = RB::find_node(&self.root, key.clone());
         match z {
-            None => return,
+            None => {
+                return;
+            },
             _ => (),
         };
         if RB::is_node_equal(&self.root, &z)
@@ -211,20 +213,29 @@ impl<T: Ord + Clone + Debug> RedBlackTree<T> {
         }
 
         //RB::print_tree(&z);
-        RB::solidify_all_nil(&self.root);
+        //RB::solidify_all_nil(&self.root);
         let mut x: TRoot<T> = None;
         let mut y = z.clone();
         let mut y_orig_color = RB::get_root_color(&y);
 
         if RB::get_root_nil(&RB::get_left(&z)) {
+            if RB::get_root_nil(&RB::get_right(&z)) {
+                RB::set_child_nil(&z, Dir::Right);
+            }
             x = RB::get_right(&z);
             self.transplant(&z, &RB::get_right(&z));
         } else if RB::get_root_nil(&RB::get_right(&z)) {
+            if RB::get_root_nil(&RB::get_left(&z)) {
+                RB::set_child_nil(&z, Dir::Left);
+            }
             x = RB::get_left(&z);
             self.transplant(&z, &RB::get_left(&z));
         } else {
             y = RB::get_minimum(&RB::get_right(&z));
             y_orig_color = RB::get_root_color(&y);
+            if RB::get_root_nil(&RB::get_right(&y)) {
+                RB::set_child_nil(&y, Dir::Right);
+            }
             x = RB::get_right(&y);
 
             if RB::is_node_equal(&RB::get_parent(&y), &z) {
@@ -241,11 +252,23 @@ impl<T: Ord + Clone + Debug> RedBlackTree<T> {
             RB::set_root_color(&y, RB::get_root_color(&z));
         }
 
+        let x_nil_fix = x.clone();
+
         match y_orig_color {
             NC::Red => (),
             NC::Black => self.delete_fixup(&x, None),
         };
-        RB::virtualize_all_nil(&self.root);
+
+        if !RB::get_root_nil(&x_nil_fix) {
+            return;
+        }
+        
+        if RB::is_node_equal(&x_nil_fix, &RB::get_left(&RB::get_parent(&x_nil_fix))) {
+            RB::set_child(&RB::get_parent(&x_nil_fix), None, Dir::Left);
+        } else if RB::is_node_equal(&x_nil_fix, &RB::get_right(&RB::get_parent(&x_nil_fix))) {
+            RB::set_child(&RB::get_parent(&x_nil_fix), None, Dir::Right);
+        } else {()}
+        //RB::virtualize_all_nil(&self.root);
     }
 
     pub fn insert(&mut self, key: &T) {
